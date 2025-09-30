@@ -1,7 +1,15 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { TextField, InputAdornment, IconButton, CircularProgress, Paper, List, ListItemButton, Box } from '@mui/material';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
-import SearchIcon from '@mui/icons-material/Search';
+import {
+    TextField,
+    InputAdornment,
+    IconButton,
+    CircularProgress,
+    Paper,
+    List,
+    ListItemButton,
+    Box,
+} from '@mui/material';
+import { MyLocation, Search } from '@mui/icons-material';
 import { useGeoStore } from '@/store/geoStore';
 import { reverseGeocode } from '@/utils/geo';
 
@@ -54,7 +62,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ value, onChange,
                             return `${city}, ${country}`;
                         })
                         .filter(entry => entry && entry.includes(','))
-                        .filter((entry, index, array) => array.indexOf(entry) === index); // Remove duplicates
+                        .filter((entry, index, array) => array.indexOf(entry) === index);
                     setSuggestions(results);
                 } catch (error) {
                     console.error('Error fetching location suggestions:', error);
@@ -117,13 +125,13 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ value, onChange,
                     input: {
                         startAdornment: (
                             <InputAdornment position='start'>
-                                <SearchIcon />
+                                <Search />
                             </InputAdornment>
                         ),
                         endAdornment: (
                             <InputAdornment position='end'>
                                 <IconButton onClick={handleDetectLocation}>
-                                    {loading ? <CircularProgress size={20} /> : <MyLocationIcon />}
+                                    {loading ? <CircularProgress size={20} /> : <MyLocation />}
                                 </IconButton>
                             </InputAdornment>
                         ),

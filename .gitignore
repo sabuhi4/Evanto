@@ -17,6 +17,11 @@ dist-ssr
 .env.development
 .env.staging
 
+# Documentation files for development
+CLAUDE.md
+ARCHITECTURE.md
+API.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

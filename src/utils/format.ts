@@ -58,4 +58,3 @@ export const formatPrice = (price: number | undefined): string => {
     if (price === 0) return 'Free';
     return `$${Math.round(price)}`;
 };
-
