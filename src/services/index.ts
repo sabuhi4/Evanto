@@ -1,0 +1,45 @@
+export { 
+  createEvent,
+  getEvents,
+  updateEvent,
+  deleteEvent,
+  createMeetup,
+  getMeetups,
+  updateMeetup,
+  deleteMeetup,
+  createUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+  createBooking,
+  getUserBookings,
+  updateBookingStatus,
+  fetchPaymentCards,
+  createPaymentCard,
+  updatePaymentCard,
+  deletePaymentCard,
+  setDefaultPaymentCard,
+  fetchFavorites,
+  addFavorite,
+  deleteFavorite,
+  fetchUserProfile,
+  updateUserProfile,
+  fetchUserStats,
+  getSeatAvailability,
+  // Unified service functions
+  getAllItems,
+  getItemById
+} from './dataService';
+
+export type { 
+  Event, 
+  Meetup, 
+  User,
+  Booking,
+  Favorite,
+  PaymentMethod,
+  UnifiedItem,
+  AuthProvider,
+  UserProfile,
+  BookingFormData
+} from '@/utils/schemas';
