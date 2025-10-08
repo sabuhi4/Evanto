@@ -13,7 +13,7 @@ import {
     Typography,
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
 
@@ -21,7 +21,7 @@ type TabType = 'general' | 'account' | 'services' | 'payment';
 
 function Help() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [activeTab, setActiveTab] = useState<TabType>('general');
 
     const handleBack = () => {
@@ -253,3 +253,4 @@ function Help() {
 }
 
 export default Help;
+

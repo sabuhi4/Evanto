@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Box, CircularProgress, Button, Typography } from '@mui/material';
 import { Container } from '@mui/material';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import EventCard from '@/components/cards/EventCard';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useFavorite } from '@/hooks/useFavorite';
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 function Favorites() {
     const navigate = useNavigate();
     const { favorites, isLoading: favoritesLoading } = useFavorite();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     
     // Get unified items (events + meetups)
     const { data: items = [], isLoading: itemsLoading } = useUnifiedItems();
@@ -36,14 +37,18 @@ function Favorites() {
 
     return (
         <>
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
+            </Box>
             <Container className='relative min-h-screen'>
-                <PageHeader 
-                    title="Favorites"
-                    showBackButton={true}
-                    showMenuButton={false}
-                />
+                <Box className='no-scrollbar w-full overflow-y-auto'>
+                    <PageHeader 
+                        title="Favorites"
+                        showBackButton={true}
+                        showMenuButton={false}
+                    />
                 {favorites.length === 0 ? (
-                    <Typography className="text-center text-muted">
+                    <Typography className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         No favorites yet.
                     </Typography>
                 ) : (
@@ -62,6 +67,7 @@ function Favorites() {
                         })}
                     </Box>
                 )}
+                </Box>
                 <BottomAppBar />
             </Container>
         </>

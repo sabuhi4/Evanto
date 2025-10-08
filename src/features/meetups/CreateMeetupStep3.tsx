@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/notifications';
 import { useUserStore } from '@/store/userStore';
 import { useDataStore } from '@/store/dataStore';
-import { useCreateMeetup } from '@/hooks/entityConfigs';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useCreateMeetup } from '@/hooks/useData';
 
 function CreateMeetupStep3() {
     const navigate = useNavigate();
@@ -15,7 +14,7 @@ function CreateMeetupStep3() {
     const createMeetupMutation = useCreateMeetup();
     const [description, setDescriptionLocal] = useState('');
     const [link, setLinkLocal] = useState('');
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const handleCreate = async () => {
         if (!description.trim()) {
@@ -69,7 +68,7 @@ function CreateMeetupStep3() {
             
             <Container className="relative min-h-screen">
                 <Box className='mb-8 flex w-full items-center justify-between'>
-                <IconButton onClick={handleBack} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700">
+                <IconButton onClick={handleBack} className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} border border-neutral-200 bg-gray-100 dark:bg-gray-700`}>
                     <KeyboardArrowLeft />
                 </IconButton>
                 <Typography variant='h4' className='font-jakarta font-semibold text-primary'>Create Meetup</Typography>
@@ -78,7 +77,7 @@ function CreateMeetupStep3() {
 
             <Box className='mb-8 w-full'>
                 <Typography variant='h5' className={`mb-2 font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Describe your meetup</Typography>
-                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Tell people what to expect and why they should join.
                 </Typography>
                 <TextField
@@ -95,7 +94,7 @@ function CreateMeetupStep3() {
 
             <Box className='mb-8 w-full'>
                 <Typography variant='h5' className={`mb-2 font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Meeting link (optional)</Typography>
-                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Add a link if this is an online meetup.
                 </Typography>
                 <TextField
@@ -124,4 +123,5 @@ function CreateMeetupStep3() {
 }
 
 export default CreateMeetupStep3;
+
 

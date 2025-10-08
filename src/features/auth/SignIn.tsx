@@ -20,12 +20,11 @@ import { Link } from 'react-router-dom';
 import LogoLight from '@/assets/icons/logo-light.svg?react';
 import LogoDark from '@/assets/icons/logo-dark.svg?react';
 import { useUserStore } from '@/store/userStore';
-import { useDarkMode } from '@/contexts/DarkModeContext';
 
 export const SignIn = () => {
     const navigate = useNavigate();
     const { setUser } = useUserStore();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [showPassword, setShowPassword] = useState(false);
 
     const {
@@ -37,82 +36,33 @@ export const SignIn = () => {
     });
 
     const onSubmit = async (data: z.infer<typeof signInSchema>) => {
-        const credentials = {
-            email: data.email.trim().toLowerCase(),
-            password: data.password.trim(),
-        };
+        try {
+            const { data: authData, error } = await supabase.auth.signInWithPassword({
+                email: data.email.trim().toLowerCase(),
+                password: data.password.trim(),
+            });
 
-        const { data: authData, error } = await supabase.auth.signInWithPassword(credentials);
-
-        if (error) {
-            let errorMessage = 'Login failed. Please try again.';
-            
-            if (error.message.includes('Invalid login credentials') || 
-                error.message.includes('Invalid email or password') ||
-                error.message.includes('Invalid credentials')) {
-                errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-            } else if (error.message.includes('Email not confirmed')) {
-                errorMessage = 'Please check your email and click the confirmation link before signing in.';
-            } else if (error.message.includes('Too many requests')) {
-                errorMessage = 'Too many login attempts. Please wait a moment before trying again.';
-            } else if (error.message.includes('User not found')) {
-                errorMessage = 'No account found with this email address. Please sign up first.';
-            } else if (error.message.includes('Invalid email')) {
-                errorMessage = 'Please enter a valid email address.';
+            if (error) {
+                showError('Invalid email or password');
+                return;
             }
-            
-            showError(errorMessage);
-            return;
-        }
 
-        if (authData.session && authData.user) {
-            // For email/password users, get profile from database
-            try {
-                const { fetchUserProfile } = await import('@/services');
-                const userProfile = await fetchUserProfile();
-                
-                if (userProfile) {
-                    setUser({
-                        id: userProfile.id,
-                        email: userProfile.email,
-                        full_name: userProfile.full_name,
-                        avatar_url: userProfile.avatar_url,
-                        user_interests: userProfile.user_interests || [],
-                        notifications_enabled: userProfile.notifications_enabled ?? true,
-                        language: userProfile.language || 'en',
-                        dark_mode: userProfile.dark_mode ?? false,
-                    });
-                } else {
-                    // Fallback to auth data
-                    setUser({
-                        id: authData.user.id,
-                        email: authData.user.email || '',
-                        full_name: authData.user.user_metadata?.full_name || authData.user.user_metadata?.name || 'User',
-                        avatar_url: authData.user.user_metadata?.avatar_url || authData.user.user_metadata?.picture,
-                        user_interests: [],
-                        notifications_enabled: true,
-                        language: 'en',
-                        dark_mode: false,
-                    });
-                }
-            } catch (error) {
-                // Fallback to auth data if database fetch fails
+            if (authData.user) {
                 setUser({
                     id: authData.user.id,
                     email: authData.user.email || '',
-                    full_name: authData.user.user_metadata?.full_name || authData.user.user_metadata?.name || 'User',
-                    avatar_url: authData.user.user_metadata?.avatar_url || authData.user.user_metadata?.picture,
+                    full_name: authData.user.user_metadata?.full_name || 'User',
+                    avatar_url: authData.user.user_metadata?.avatar_url || null,
                     user_interests: [],
                     notifications_enabled: true,
                     language: 'en',
                     dark_mode: false,
                 });
+                
+                navigate('/home');
             }
-            
-            showSuccess('Signed in successfully!');
-            navigate('/home');
-        } else {
-            showError('No session created');
+        } catch (error) {
+            showError('Sign-in failed');
         }
     };
 
@@ -120,7 +70,7 @@ export const SignIn = () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider,
             options: {
-                redirectTo: window.location.origin + '/home',
+                redirectTo: window.location.origin + '/',
                 scopes: provider === 'google' ? 'openid email profile https://www.googleapis.com/auth/userinfo.profile' : undefined,
                 queryParams: provider === 'google' ? {
                     access_type: 'offline',
@@ -205,7 +155,7 @@ export const SignIn = () => {
                     error={!!errors.password}
                     helperText={errors.password?.message}
                 />
-                    <Link to="/auth/forgot-password" className={`mb-2 underline text-sm ${isDarkMode ? 'text-white' : 'text-primary'}`}>
+                    <Link to="/auth/forgot-password" className={`mb-2 underline text-sm ${isDarkMode ? 'text-white' : 'text-blue-500'}`}>
                         Forgot Password?
                     </Link>
                     <Button 
@@ -224,18 +174,18 @@ export const SignIn = () => {
                     </Divider>
                     <Box className="flex w-full justify-center gap-3">
                         <Button variant="outlined" className="h-12 w-12 font-jakarta min-w-12">
-                            <AppleIcon className="text-primary text-xl" />
+                            <AppleIcon className="text-blue-500 text-xl" />
                         </Button>
                         <Button variant="outlined" className="h-12 w-12 font-jakarta min-w-12" onClick={() => handleOAuthSignIn('google')}>
-                            <GoogleIcon className="text-primary text-xl" />
+                            <GoogleIcon className="text-blue-500 text-xl" />
                         </Button>
                         <Button variant="outlined" className="h-12 w-12 font-jakarta min-w-12" onClick={() => handleOAuthSignIn('facebook')}>
-                            <FacebookOutlined className="text-primary text-xl" />
+                            <FacebookOutlined className="text-blue-500 text-xl" />
                         </Button>
                     </Box>
                     <Box className="w-full text-center mt-2">
                         <Typography variant="body2" className={`font-jakarta ${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'}`}>
-                            Don't have an account? <Link to="/auth/sign-up" className="text-primary font-medium">Sign Up</Link>
+                            Don't have an account? <Link to="/auth/sign-up" className="text-blue-500 font-medium">Sign Up</Link>
                         </Typography>
                     </Box>
                 </Box>

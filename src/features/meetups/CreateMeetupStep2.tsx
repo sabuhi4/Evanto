@@ -3,7 +3,7 @@ import { Box, Typography, Button, TextField, IconButton, MenuItem, Container } f
 import { KeyboardArrowLeft } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useDataStore } from '@/store/dataStore';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { useFiltersStore } from '@/store/filtersStore';
 
 function CreateMeetupStep2() {
@@ -12,7 +12,7 @@ function CreateMeetupStep2() {
     const [date, setDateLocal] = useState('');
     const [category, setCategoryLocal] = useState('Other');
     const [maxParticipants, setMaxParticipantsLocal] = useState('');
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const { categories } = useFiltersStore();
 
     const handleNext = () => {
@@ -37,16 +37,16 @@ function CreateMeetupStep2() {
             
             <Container className="relative min-h-screen">
             <Box className='mb-8 flex w-full items-center justify-between'>
-                <IconButton onClick={handleBack} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700">
+                <IconButton onClick={handleBack} className="">
                     <KeyboardArrowLeft />
                 </IconButton>
-                <Typography variant='h4' className='font-jakarta font-semibold text-primary'>Create Meetup</Typography>
+                <Typography variant='h4' className='font-jakarta font-semibold text-blue-500 dark:text-blue-400'>Create Meetup</Typography>
                 <Box className='w-10' />
             </Box>
 
             <Box className='mb-6'>
                 <Typography variant='h5' className={`mb-2 font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>When is your meetup?</Typography>
-                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Choose a date and time that works for your audience.
                 </Typography>
                 <TextField
@@ -64,7 +64,7 @@ function CreateMeetupStep2() {
 
             <Box className='mb-6'>
                 <Typography variant='h5' className={`mb-2 font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>What category?</Typography>
-                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Choose a category that best describes your meetup.
                 </Typography>
                 <TextField
@@ -85,7 +85,7 @@ function CreateMeetupStep2() {
 
             <Box className='mb-6'>
                 <Typography variant='h5' className={`mb-2 font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Max participants (optional)</Typography>
-                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                <Typography variant='body2' className={`mb-4 font-poppins ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Set a limit on how many people can join. Leave empty for unlimited.
                 </Typography>
                 <TextField
@@ -116,4 +116,5 @@ function CreateMeetupStep2() {
 }
 
 export default CreateMeetupStep2;
+
 

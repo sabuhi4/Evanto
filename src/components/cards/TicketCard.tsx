@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, CardMedia } from '@mui/material';
 import { LocationOn, CalendarToday, AccessTime, EventSeat } from '@mui/icons-material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 interface TicketCardProps {
     imageUrl: string;
@@ -15,7 +15,7 @@ interface TicketCardProps {
 }
 
 const TicketCard = ({ imageUrl, eventName, eventTime, eventLocation, eventDate, seatNumber, ticketNumber, ticketId }: TicketCardProps) => {
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     
     const TicketLabel = ({ children }: { children: React.ReactNode }) => (
         <Typography variant='caption' className={`font-medium text-xs ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
@@ -100,3 +100,4 @@ const TicketCard = ({ imageUrl, eventName, eventTime, eventLocation, eventDate, 
     );
 };
 export default TicketCard;
+

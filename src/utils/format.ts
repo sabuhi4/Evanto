@@ -13,10 +13,6 @@ export const formatEventRange = (start?: string | Date, end?: string | Date) => 
     return `${format(startDate, 'dd')} - ${format(endDate, 'dd MMM yyyy')}`;
 };
 
-/**
- * Smart date formatting that adapts based on proximity to current date
- * Shows: "Today", "Tomorrow", "In X days", "Dec 15", "Dec 15, 2024"
- */
 export const formatSmartDate = (date: string | Date, includeTime: boolean = false): string => {
     if (!date) return '';
 
@@ -50,9 +46,6 @@ export const formatSmartDate = (date: string | Date, includeTime: boolean = fals
     return dateStr;
 };
 
-/**
- * Format price with currency symbol
- */
 export const formatPrice = (price: number | undefined): string => {
     if (price === undefined || price === null) return 'Free';
     if (price === 0) return 'Free';

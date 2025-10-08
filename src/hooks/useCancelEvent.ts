@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { updateEvent, updateMeetup } from '@/services/dataService';
-import toast from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import type { UnifiedItem } from '@/utils/schemas';
 
 export const useCancelEvent = () => {
@@ -10,7 +10,7 @@ export const useCancelEvent = () => {
 
     const cancelEvent = async (item: UnifiedItem) => {
         if (!item.id) {
-            toast.error('Event ID not found');
+            showError('Event ID not found');
             return;
         }
 
@@ -18,20 +18,19 @@ export const useCancelEvent = () => {
         try {
             if (item.type === 'event') {
                 await updateEvent(item.id, { status: 'cancelled' });
-                toast.success('Event cancelled successfully');
+                showSuccess('Event cancelled successfully');
             } else if (item.type === 'meetup') {
                 await updateMeetup(item.id, { status: 'cancelled' });
-                toast.success('Meetup cancelled successfully');
+                showSuccess('Meetup cancelled successfully');
             }
 
-            // Invalidate and refetch relevant queries
             await queryClient.invalidateQueries({ queryKey: ['events'] });
             await queryClient.invalidateQueries({ queryKey: ['meetups'] });
             await queryClient.invalidateQueries({ queryKey: ['unifiedItems'] });
             
         } catch (error) {
             console.error('Error cancelling event:', error);
-            toast.error('Failed to cancel event. Please try again.');
+            showError('Failed to cancel event. Please try again.');
         } finally {
             setIsLoading(false);
         }

@@ -1,6 +1,7 @@
 import { Chip, IconButton, Stack, Typography } from '@mui/material';
 import { Container } from '@mui/material';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useFiltersStore } from '@/store/filtersStore';
 import { getCategoryIcon } from '@/components/icons/CategoryIcon';
 import { KeyboardArrowLeft, MoreVertOutlined } from '@mui/icons-material';
@@ -10,13 +11,14 @@ import { useUnifiedItems } from '@/hooks/useUnifiedItems';
 import { usePagination } from '@/hooks/usePagination';
 import { Box, Button } from '@mui/material';
 import { isAfter, isToday, startOfDay } from 'date-fns';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 function UpcomingEvent() {
     const navigate = useNavigate();
     const { categoryFilter, setCategoryFilter, categories } = useFiltersStore();
     const { getVisibleItems, loadMore, hasMore, getRemainingCount } = usePagination();
-    const { isDarkMode, toggleDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
+    const toggleDarkMode = useUserStore(state => state.toggleDarkMode);
 
     const { data: allItems = [] } = useUnifiedItems();
 
@@ -32,15 +34,8 @@ function UpcomingEvent() {
 
     return (
         <>
-            <Box className='absolute right-4 top-4 z-10 flex gap-2'>
-                <Button
-                    onClick={toggleDarkMode}
-                    size='small'
-                    variant='outlined'
-                    className={`text-xs ${isDarkMode ? 'border-gray-600 text-white' : 'border-gray-300 text-gray-700'}`}
-                >
-                    {isDarkMode ? '☀️' : '🌙'}
-                </Button>
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
             </Box>
 
             <Container className='relative min-h-screen'>
@@ -48,7 +43,6 @@ function UpcomingEvent() {
                     <Box className='mb-8 flex w-full items-center justify-between'>
                         <IconButton
                             onClick={() => navigate(-1)}
-                            className={`text-text-3 border border-neutral-200 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-700'}`}
                         >
                             <KeyboardArrowLeft />
                         </IconButton>
@@ -58,9 +52,7 @@ function UpcomingEvent() {
                         >
                             Upcoming Events
                         </Typography>
-                        <IconButton
-                            className={`text-text-3 border border-neutral-200 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-700'}`}
-                        >
+                        <IconButton>
                             <MoreVertOutlined />
                         </IconButton>
                     </Box>

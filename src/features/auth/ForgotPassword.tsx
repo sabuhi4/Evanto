@@ -7,7 +7,7 @@ import { forgotPasswordSchema } from '@/utils/schemas';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/utils/supabase';
-import { toast } from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { useNavigate } from 'react-router-dom';
 
 function ForgotPassword() {
@@ -23,18 +23,18 @@ function ForgotPassword() {
     });
 
     const onSubmit = async (data: z.infer<typeof forgotPasswordSchema>) => {
-        const toastId = toast.loading('Sending verification code...');
+        showSuccess('Sending verification code...');
 
         const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
             redirectTo: `${window.location.origin}/auth/verify-code`,
         });
 
         if (error) {
-            toast.error(error.message, { id: toastId, duration: 5000 });
+            showError(error.message);
             return;
         }
 
-        toast.success('Verification code sent!', { id: toastId, duration: 5000 });
+        showSuccess('Verification code sent!');
 
         localStorage.setItem('reset_email', data.email);
         navigate('/auth/email-sent');
@@ -45,18 +45,18 @@ function ForgotPassword() {
         <Container className='relative'>
             <Box className='no-scrollbar w-full overflow-y-auto'>
                 <Box className='mb-8 flex w-full items-center justify-between'>
-                    <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                    <IconButton size='medium' onClick={() => navigate(-1)} className="" sx={{ borderRadius: '50%' }}>
                         <KeyboardArrowLeft />
                     </IconButton>
-                    <Typography variant='h5' className="text-heading">Forgot Password</Typography>
+                    <Typography variant='h5' className="text-gray-900 dark:text-white">Forgot Password</Typography>
                     <Box className='w-10' />
                 </Box>
-                <Box className='auth-container'>
+                <Box className='flex flex-col gap-6 text-start'>
                     <Typography variant='body1'>
                         Enter the email associated with your account and we'll send an email with instructions to reset your
                         password.
                     </Typography>
-                    <form onSubmit={handleSubmit(onSubmit)} className='auth-form'>
+                    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
                         <TextField
                             label='Email'
                             placeholder='example@gmail.com'

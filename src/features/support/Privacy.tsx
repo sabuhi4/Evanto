@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Container } from '@mui/material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
 
 function Privacy() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const handleBack = () => {
         navigate(-1);
@@ -89,3 +89,4 @@ function Privacy() {
 }
 
 export default Privacy;
+

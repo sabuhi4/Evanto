@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import { KeyboardArrowLeft, MoreVertOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useUserStore } from '@/store/userStore';
 
 interface PageHeaderProps {
     title: string;
@@ -25,6 +26,7 @@ export const PageHeader = ({
     className = 'mb-6'
 }: PageHeaderProps): React.JSX.Element => {
     const navigate = useNavigate();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const handleBackClick = () => {
         if (onBackClick) {
@@ -39,7 +41,6 @@ export const PageHeader = ({
         <IconButton 
             size='medium'
             onClick={onRightIconClick}
-            className="border border-blue-500 rounded-full"
         >
             {rightIcon}
         </IconButton>
@@ -47,7 +48,7 @@ export const PageHeader = ({
         <IconButton 
             size='medium'
             onClick={onMenuClick}
-            className={`border border-blue-500 rounded-full ${showMenuButton ? 'visible' : 'invisible'}`}
+            className={`${showMenuButton ? 'visible' : 'invisible'}`}
         >
             <MoreVertOutlined />
         </IconButton>
@@ -58,12 +59,12 @@ export const PageHeader = ({
             <IconButton 
                 size='medium'
                 onClick={handleBackClick} 
-                className={`border border-blue-500 rounded-full ${showBackButton ? 'visible' : 'invisible'}`}
+                className={`${showBackButton ? 'visible' : 'invisible'}`}
             >
                 <KeyboardArrowLeft />
             </IconButton>
             
-            <Typography variant='h5' className="font-bold text-neutral-900 dark:text-white">
+            <Typography variant='h5' className={`font-bold ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
                 {title}
             </Typography>
             

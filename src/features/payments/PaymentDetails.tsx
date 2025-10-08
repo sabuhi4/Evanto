@@ -30,7 +30,7 @@ import { z } from 'zod';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/utils/supabase';
 import { showSuccess, showError } from '@/utils/notifications';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 // Form-specific schema for payment card input
 const paymentCardFormSchema = z.object({
@@ -53,7 +53,7 @@ type PaymentCardFormData = z.infer<typeof paymentCardFormSchema>;
 
 function PaymentDetails() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [searchParams] = useSearchParams();
     const editCardId = searchParams.get('edit');
     const [isEditing, setIsEditing] = useState(false);
@@ -261,7 +261,7 @@ function PaymentDetails() {
             <>
                 <Container className="relative min-h-screen">
                     <Box className={'mb-8 flex w-full items-center justify-between'}>
-                        <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                        <IconButton size='medium' onClick={() => navigate(-1)} className="text-gray-600 dark:text-gray-400 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
                             <KeyboardArrowLeftOutlined />
                         </IconButton>
                         <Typography variant='h4' className={`font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -282,14 +282,14 @@ function PaymentDetails() {
             
             <Container className="relative min-h-screen">
                 <Box className={'mb-8 flex w-full items-center justify-between'}>
-                    <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                    <IconButton size='medium' onClick={() => navigate(-1)} className="text-gray-600 dark:text-gray-400 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
                         <KeyboardArrowLeftOutlined />
                     </IconButton>
                     <Typography variant='h4' className={`font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         {isEditing ? 'Edit Card' : 'Add New Card'}
                     </Typography>
                     <IconButton 
-                        className="text-primary bg-primary/10 border border-primary hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 hover:scale-105"
+                        className="text-blue-500 bg-blue-50 border border-blue-500 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200 hover:scale-105"
                         onClick={() => {
                             // TODO: Implement card scanning functionality
                             showSuccess('Card scanning feature coming soon!');
@@ -354,7 +354,7 @@ function PaymentDetails() {
                             setCardType(e.target.value);
                             setValue('card_type', e.target.value as 'mastercard' | 'visa');
                         }}
-                        className="text-input"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                         sx={{
                             '& .MuiSelect-select': {
                                 display: 'flex',
@@ -392,7 +392,7 @@ function PaymentDetails() {
                     {...register('card_holder')}
                     error={!!errors.card_holder}
                     helperText={isEditing ? 'Enter the new card holder name' : errors.card_holder?.message}
-                    className="text-input"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     sx={{
                         '& .MuiOutlinedInput-root': {
                             '& fieldset': {
@@ -429,7 +429,7 @@ function PaymentDetails() {
                     {...register('card_number')}
                     error={!!errors.card_number}
                     helperText={isEditing ? 'Enter the new card number' : errors.card_number?.message}
-                    className="text-input"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     onChange={(e) => {
                         const formatted = formatCardNumber(e.target.value);
                         e.target.value = formatted;
@@ -475,7 +475,7 @@ function PaymentDetails() {
                         {...register('cvv')}
                         error={!!errors.cvv}
                         helperText={isEditing ? 'Enter the new CVV' : errors.cvv?.message}
-                        className="text-input"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': {
@@ -520,7 +520,7 @@ function PaymentDetails() {
                             errors.expiry_date?.message || 
                             (!validateExpiryDate(formData.expiry_date) && formData.expiry_date ? 'Card has expired' : '')
                         }
-                        className="text-input"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                         onChange={(e) => {
                             const formatted = formatExpiryDate(e.target.value);
                             e.target.value = formatted;
@@ -610,3 +610,4 @@ function PaymentDetails() {
 }
 
 export default PaymentDetails;
+

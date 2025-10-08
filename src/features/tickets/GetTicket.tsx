@@ -16,7 +16,7 @@ import { Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '@/store/bookingStore';
 import { UnifiedItem } from '@/utils/schemas';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { Dialog } from '@mui/material';
 
 interface GetTicketProps {
@@ -28,7 +28,7 @@ interface GetTicketProps {
 function GetTicket({ open, onClose }: GetTicketProps) {
     const navigate = useNavigate();
     const { bookingData: bookingFlow, getTotalPrice } = useBookingStore();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const handleGetTicket = () => {
         onClose();
@@ -152,3 +152,4 @@ function GetTicket({ open, onClose }: GetTicketProps) {
 }
 
 export default GetTicket;
+

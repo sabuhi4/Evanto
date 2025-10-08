@@ -1,14 +1,14 @@
 import { Box, BottomNavigation, BottomNavigationAction } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 interface BottomAppBarProps {
     className?: string;
 }
 
 export const BottomAppBar = ({ className }: BottomAppBarProps): React.JSX.Element => {
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const navigate = useNavigate();
     const location = useLocation();
     const [value, setValue] = useState(0);
@@ -45,7 +45,7 @@ export const BottomAppBar = ({ className }: BottomAppBarProps): React.JSX.Elemen
           onChange={(event, newValue) => {
             setValue(newValue);
           }}
-          showLabels={true}
+          showLabels
           className={`${className} absolute bottom-0 -left-6 -right-6 w-[calc(100%+48px)] h-[119px] pt-6`}
           sx={{ 
             background: `url("data:image/svg+xml,${encodeURIComponent(curvedSvg)}")`,
@@ -55,7 +55,8 @@ export const BottomAppBar = ({ className }: BottomAppBarProps): React.JSX.Elemen
             '& .MuiBottomNavigationAction-label': {
               display: 'block',
               fontSize: '12px',
-              marginTop: '4px'
+              marginTop: '4px',
+              color: isDarkMode ? '#CBD5E1' : '#4B5563'
             }
           }}
         >
@@ -112,3 +113,4 @@ export const BottomAppBar = ({ className }: BottomAppBarProps): React.JSX.Elemen
         </BottomNavigation>
     );
 };
+

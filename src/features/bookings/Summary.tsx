@@ -9,18 +9,17 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '@/store/bookingStore';
 import { formatSmartDate } from '@/utils/format';
-import toast from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { useUserStore } from '@/store/userStore';
 import { usePaymentCards } from '@/hooks/usePaymentCards';
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
-import { useBookings, useCreateBooking } from '@/hooks/entityConfigs';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useBookings, useCreateBooking } from '@/hooks/useData';
 
 function Summary() {
     const navigate = useNavigate();
     const { bookingData: bookingFlow, setBookingData, getTotalPrice } = useBookingStore();
     const { user } = useUserStore();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const { data: paymentCards, isLoading: cardsLoading, error: cardsError } = usePaymentCards();
     
     // Use unified data fetching
@@ -49,7 +48,7 @@ function Summary() {
     const handlePayment = async () => {
         try {
             if (!user) {
-                toast.error('Please sign in to complete booking');
+                showError('Please sign in to complete booking');
                 navigate('/auth/sign-in');
                 return;
             }
@@ -64,9 +63,9 @@ function Summary() {
             
             if (existingBooking) {
                 if (process.env.NODE_ENV === 'development') {
-                    toast.success('Development mode: Allowing re-booking for testing purposes');
+                    showSuccess('Development mode: Allowing re-booking for testing purposes');
                 } else {
-                    toast.error('You have already booked this event! View your bookings in the Profile section.');
+                    showError('You have already booked this event! View your bookings in the Profile section.');
                     return;
                 }
             }
@@ -92,23 +91,23 @@ function Summary() {
             createBookingMutation.mutate(bookingPayload, {
                 onSuccess: () => {
                     setBookingData({ booking_id: bookingId });
-                    toast.success('Booking confirmed!');
+                    showSuccess('Booking confirmed!');
                     navigate('/home');
                 },
                 onError: (bookingError: any) => {
                     // Handle duplicate booking scenario
                     if (bookingError?.code === '23505' && bookingError?.message?.includes('bookings_user_id_event_id_key')) {
-                        toast.error('You have already booked this event!');
+                        showError('You have already booked this event!');
                     } else {
                         console.error('Booking error:', bookingError);
-                        toast.error('Failed to create booking. Please try again.');
+                        showError('Failed to create booking. Please try again.');
                     }
                 }
             });
         } catch (error: unknown) {
             console.error('Booking creation error:', error);
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-            toast.error('Payment failed: ' + errorMessage);
+            showError('Payment failed: ' + errorMessage);
         }
     };
 
@@ -116,10 +115,10 @@ function Summary() {
         if (bookingFlow.booking_id) {
             try {
                 await navigator.clipboard.writeText(bookingFlow.booking_id);
-                toast.success('Booking ID copied!');
+                showSuccess('Booking ID copied!');
             } catch (error: unknown) {
                 const errorMessage = error instanceof Error ? error.message : 'Failed to copy';
-                toast.error('Copy failed: ' + errorMessage);
+                showError('Copy failed: ' + errorMessage);
             }
         }
     };
@@ -186,7 +185,7 @@ function Summary() {
                 <Box className='mb-8 flex w-full items-center justify-between'>
                     <IconButton 
                         onClick={() => navigate(-1)} 
-                        className={`${isDarkMode ? 'text-white border border-white/20 bg-transparent' : 'text-muted border border-neutral-200 bg-gray-100'}`}
+                        className={`${isDarkMode ? 'text-white border border-white/20 bg-transparent' : 'text-gray-600 border border-neutral-200 bg-gray-100'}`}
                         sx={{
                             border: isDarkMode ? '1px solid #FFFFFF33' : '1px solid #D1D5DB',
                             '&:hover': {
@@ -196,7 +195,7 @@ function Summary() {
                     >
                         <KeyboardArrowLeft />
                     </IconButton>
-                    <Typography variant='h4' className='font-jakarta font-semibold text-primary'>Summary</Typography>
+                    <Typography variant='h4' className='font-jakarta font-semibold text-blue-500 dark:text-blue-400'>Summary</Typography>
                     <Box className='w-8' /> {/* Spacer for alignment */}
                 </Box>
 
@@ -223,7 +222,7 @@ function Summary() {
                     <Box className='flex flex-col justify-between min-w-0 flex-1'>
                         <Chip
                             label={getItemCategory()}
-                            className={`h-5 w-auto text-xs px-1 ${isDarkMode ? 'bg-primary bg-opacity-20 text-primary' : 'bg-blue-100 text-blue-600'}`}
+                            className={`h-5 w-auto text-xs px-1 ${isDarkMode ? 'bg-blue-500 bg-opacity-20 text-blue-500' : 'bg-blue-100 text-blue-600'}`}
                         />
                         <Typography variant='h6' className={`line-clamp-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             {getItemTitle()}
@@ -249,7 +248,7 @@ function Summary() {
                             </Typography>
                         </Box>
                         <Box className='ml-2 flex-1'>
-                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-muted' : 'text-muted'}`}>Seat</Typography>
+                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Seat</Typography>
                             <Typography variant='body2' className={`line-clamp-1 text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 {bookingFlow.selected_seats.map(seat => `${String.fromCharCode(65 + seat.row)}${seat.column + 1}`).join(', ') || 'No seats selected'}
                             </Typography>
@@ -257,17 +256,17 @@ function Summary() {
                     </Box>
                     <Box className='flex justify-between'>
                         <Box className='flex-1'>
-                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-muted' : 'text-muted'}`}>Date</Typography>
+                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Date</Typography>
                             <Typography variant='body2' className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{formatDate(getItemDate())}</Typography>
                         </Box>
                         <Box className='ml-2 flex-1'>
-                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-muted' : 'text-muted'}`}>Time</Typography>
+                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Time</Typography>
                             <Typography variant='body2' className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{eventTime}</Typography>
                         </Box>
                     </Box>
                     <Box className='flex items-center justify-between'>
                         <Box>
-                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-muted' : 'text-muted'}`}>
+                            <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Booking ID
                             </Typography>
                             <Typography variant='body2' className={`text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{bookingFlow.booking_id || 'Pending...'}</Typography>
@@ -278,16 +277,16 @@ function Summary() {
                                 onClick={handleCopyBookingId}
                                 style={{ cursor: 'pointer' }}
                             >
-                                <ContentCopyIcon className={`text-xs ${isDarkMode ? 'text-[#AAAAAA]' : 'text-primary'}`} />
-                                <Typography variant='body2' className={`text-sm font-jakarta ${isDarkMode ? 'text-muted' : 'text-primary'}`}>
+                                <ContentCopyIcon className={`text-xs ${isDarkMode ? 'text-[#AAAAAA]' : 'text-blue-500'}`} />
+                                <Typography variant='body2' className={`text-sm font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-blue-500'}`}>
                                     Copy
                                 </Typography>
                             </Box>
                         )}
                     </Box>
                     <Box className='absolute -bottom-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-1'>
-                        <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-muted' : 'text-muted'}`}>Total Price</Typography>
-                        <Typography className={`font-jakarta text-lg font-bold ${isDarkMode ? 'text-primary' : 'text-primary'}`}>
+                        <Typography className={`font-jakarta text-xs font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Price</Typography>
+                        <Typography className={`font-jakarta text-lg font-bold ${isDarkMode ? 'text-blue-500' : 'text-blue-500'}`}>
                             ${getTotalPrice().toFixed(2)}
                         </Typography>
                     </Box>
@@ -341,3 +340,4 @@ function Summary() {
 }
 
 export default Summary;
+

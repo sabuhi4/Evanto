@@ -7,28 +7,22 @@ export interface UserProfile {
 
 export interface AuthUser {
   avatar_url?: string;
+  email?: string;
   user_metadata?: {
     avatar_url?: string;
     full_name?: string;
+    name?: string;
   };
 }
 
-/**
- * Get the appropriate avatar source with proper priority:
- * 1. User-uploaded profile photo (profile.avatar_url)
- * 2. Social login photo (user.avatar_url or user.user_metadata.avatar_url)
- * 3. Default avatar with user initials
- */
 export const getAvatarSource = (
   profile?: UserProfile | null,
   user?: AuthUser | null
 ): string | undefined => {
-  // Priority 1: User-uploaded profile photo
   if (profile?.avatar_url) {
     return profile.avatar_url;
   }
   
-  // Priority 2: Social login photo
   if (user?.avatar_url) {
     return user.avatar_url;
   }
@@ -37,13 +31,9 @@ export const getAvatarSource = (
     return user.user_metadata.avatar_url;
   }
   
-  // Priority 3: No avatar (will show default with initials)
   return undefined;
 };
 
-/**
- * Get user initials for default avatar
- */
 export const getUserInitials = (
   profile?: UserProfile | null,
   user?: AuthUser | null
@@ -56,15 +46,11 @@ export const getUserInitials = (
   
   return name
     .split(' ')
-    .map(word => word.charAt(0))
+    .map((word: string) => word.charAt(0))
     .join('')
     .toUpperCase()
     .slice(0, 2);
 };
-
-/**
- * Get avatar props for MUI Avatar component
- */
 export const getAvatarProps = (
   profile?: UserProfile | null,
   user?: AuthUser | null,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Divider } from '@mui/material';
 import { UnifiedItem } from '@/utils/schemas';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 interface SeatPickerProps {
     onSeatSelect: (seat: { row: number; column: number; type: string; price: number }) => void;
@@ -13,7 +13,7 @@ interface SeatPickerProps {
 }
 
 export const SeatPicker: React.FC<SeatPickerProps> = ({ onSeatSelect, onSeatDeselect, selectedSeats, bookedSeats, maxParticipants, item }) => {
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const getSeatPrice = (row: number) => {
         // For events, use the event's ticket_price
         if (item && item.type === 'event') {
@@ -209,3 +209,4 @@ export const SeatPicker: React.FC<SeatPickerProps> = ({ onSeatSelect, onSeatDese
         </Box>
     );
 };
+

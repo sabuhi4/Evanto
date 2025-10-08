@@ -10,7 +10,7 @@ import { useDataStore } from '@/store/dataStore';
 import { useBookingStore } from '@/store/bookingStore';
 import { showError } from '@/utils/notifications';
 import GetTicket from '@/features/tickets/GetTicket';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
@@ -22,7 +22,7 @@ function SelectSeats() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { bookingData: bookingFlow, addSeat, removeSeat } = useBookingStore();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [showGetTicket, setShowGetTicket] = useState(false);
 
     // Use unified data fetching
@@ -93,7 +93,7 @@ function SelectSeats() {
                 <Box className='mb-8 flex w-full items-center justify-between'>
                     <IconButton 
                         onClick={() => navigate(-1)} 
-                        className={`${isDarkMode ? 'text-white border border-white/20 bg-transparent' : 'text-text-3 border border-neutral-200 bg-gray-100'}`}
+                        className={`${isDarkMode ? 'text-white border border-white/20 bg-transparent' : 'text-gray-600 border border-neutral-200 bg-gray-100'}`}
                         sx={{
                             border: isDarkMode ? '1px solid #FFFFFF33' : '1px solid #D1D5DB',
                             '&:hover': {
@@ -105,7 +105,7 @@ function SelectSeats() {
                     </IconButton>
                     <Typography variant='h4' className={`font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Select Seats</Typography>
                     <IconButton 
-                        className={`${isDarkMode ? 'text-white border border-white/20 bg-transparent' : 'text-text-3 border border-neutral-200 bg-gray-100'}`}
+                        className={`${isDarkMode ? 'text-white border border-white/20 bg-transparent' : 'text-gray-600 border border-neutral-200 bg-gray-100'}`}
                         sx={{
                             border: isDarkMode ? '1px solid #FFFFFF33' : '1px solid #D1D5DB',
                             '&:hover': {
@@ -126,7 +126,7 @@ function SelectSeats() {
                     <Typography variant="h6" color="error" className="mb-2">
                         Event Fully Booked
                     </Typography>
-                    <Typography variant="body2" className={`${isDarkMode ? 'text-gray-400' : 'text-text-3'}`}>
+                    <Typography variant="body2" className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         All seats for this event have been booked.
                     </Typography>
                 </Box>
@@ -168,3 +168,4 @@ function SelectSeats() {
 }
 
 export default SelectSeats;
+

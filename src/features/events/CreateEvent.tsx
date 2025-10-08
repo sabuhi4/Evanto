@@ -12,9 +12,8 @@ import { z } from 'zod';
 import { supabase } from '@/utils/supabase';
 import { useUserStore } from '@/store/userStore';
 import { useFiltersStore } from '@/store/filtersStore';
-import { useCreateEvent } from '@/hooks/entityConfigs';
+import { useCreateEvent } from '@/hooks/useData';
 import type { Event } from '@/utils/schemas';
-import { useDarkMode } from '@/contexts/DarkModeContext';
 
 const eventFormSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -37,7 +36,7 @@ const CreateEvent: React.FC = () => {
     const userId = useUserStore(state => state.user?.id);
     const { categories } = useFiltersStore();
     const createEventMutation = useCreateEvent();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const {
         register,
@@ -135,20 +134,20 @@ const CreateEvent: React.FC = () => {
             <Container className="relative min-h-screen">
                 <Box className='no-scrollbar w-full overflow-y-auto'>
                     <Box className='mb-8 flex w-full items-center justify-between'>
-                        <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                        <IconButton size='medium' onClick={() => navigate(-1)}>
                             <KeyboardArrowLeft />
                         </IconButton>
                         <Typography variant='h4' className={`font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Create Event</Typography>
                         <Box className='w-10' />
                     </Box>
-                <Box className='auth-container'>
+                <Box className='space-y-6'>
                     <form 
                         onSubmit={handleSubmit(onSubmit, onError)}
-                        className='auth-form'
+                        className='space-y-6'
                     >
                 <TextField
                     label='Title'
-                    className='text-input'
+                    fullWidth
                     {...register('title')}
                     error={!!errors.title}
                     helperText={errors.title?.message}
@@ -196,7 +195,7 @@ const CreateEvent: React.FC = () => {
                             <TextField
                                 select
                                 label='Category'
-                                className='text-input'
+                                fullWidth
                                 {...field}
                                 error={!!errors.category}
                                 helperText={errors.category?.message}
@@ -212,7 +211,7 @@ const CreateEvent: React.FC = () => {
 
                     <TextField
                         label='Ticket Price'
-                        className='text-input'
+                        fullWidth
                         {...register('ticket_price', {
                             valueAsNumber: true,
                             min: { value: 0, message: 'Ticket price can not be negative' },
@@ -224,7 +223,7 @@ const CreateEvent: React.FC = () => {
 
                 <TextField
                     label='Max Participants (Optional)'
-                    className='text-input'
+                    fullWidth
                     type='number'
                     {...register('max_participants', {
                         valueAsNumber: true,
@@ -256,7 +255,7 @@ const CreateEvent: React.FC = () => {
                         <>
                             <Button
                                 component='label'
-                                className='flex h-40 flex-col items-center justify-center rounded-3xl border border-dashed border-primary-1 bg-primary-500/10 text-primary-1'
+                                className='flex h-24 flex-col items-center justify-center rounded-3xl border border-dashed border-primary-1 bg-primary-500/10 text-primary-1'
                             >
                                 <ImageOutlined />
                                 Add Photo +
@@ -284,7 +283,8 @@ const CreateEvent: React.FC = () => {
                             variant='contained' 
                             type='submit'
                             disabled={createEventMutation.isPending}
-                            className='font-jakarta w-button-primary h-button-primary rounded-button-primary bg-primary text-white w-full'
+                            size="large"
+                            className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-0.5"
                         >
                             {createEventMutation.isPending ? 'Creating...' : 'Create Event'}
                         </Button>
@@ -296,3 +296,4 @@ const CreateEvent: React.FC = () => {
     );
 };
 export default CreateEvent;
+

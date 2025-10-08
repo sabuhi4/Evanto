@@ -8,15 +8,14 @@ import { useUnifiedItems } from '@/hooks/useUnifiedItems';
 import { getSeatAvailability } from '@/services/dataService';
 import { useUserStore } from '@/store/userStore';
 import { createBooking } from '@/services/dataService';
-import toast from 'react-hot-toast';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { showSuccess, showError } from '@/utils/notifications';
 
 function JoinMeetup() {
     const navigate = useNavigate();
     const { id: meetupId } = useParams();
     const user = useUserStore(state => state.user);
     const [isJoining, setIsJoining] = useState(false);
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const { data: items = [] } = useUnifiedItems();
 
@@ -30,12 +29,12 @@ function JoinMeetup() {
 
     const handleJoinMeetup = async () => {
         if (!user?.id || !meetup) {
-            toast.error('User not authenticated or meetup not found');
+            showError('User not authenticated or meetup not found');
             return;
         }
 
         if (availability?.isFullyBooked) {
-            toast.error('This meetup is full');
+            showError('This meetup is full');
             return;
         }
 
@@ -52,11 +51,11 @@ function JoinMeetup() {
                 selected_seats: [], // No seats for meetups
             });
 
-            toast.success('Successfully joined the meetup!');
+            showSuccess('Successfully joined the meetup!');
             navigate('/home');
         } catch (error: any) {
             console.error('Error joining meetup:', error);
-            toast.error(error.message || 'Failed to join meetup');
+            showError(error.message || 'Failed to join meetup');
         } finally {
             setIsJoining(false);
         }
@@ -78,7 +77,7 @@ function JoinMeetup() {
             
             <Container className="relative min-h-screen">
                 <Box className='mb-8 flex w-full items-center justify-between'>
-                    <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                    <IconButton size='medium' onClick={() => navigate(-1)} className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} border border-neutral-200 bg-gray-100 dark:bg-gray-700`} sx={{ borderRadius: '50%' }}>
                         <KeyboardArrowLeft />
                     </IconButton>
                     <Typography variant='h4' className={`font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -146,3 +145,4 @@ function JoinMeetup() {
 }
 
 export default JoinMeetup;
+

@@ -51,10 +51,7 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
 
     addSeat: (seat: Omit<SeatInfo, 'seat'>) =>
         set(state => {
-            const adjustedPrice = seat.type.toLowerCase() === 'vip' 
-                ? seat.price * 1.2 
-                : seat.price;
-                
+            const adjustedPrice = seat.type.toLowerCase() === 'vip' ? seat.price * 1.2 : seat.price;
             const seatWithId: SeatInfo = {
                 seat: `${String.fromCharCode(65 + seat.row)}${seat.column + 1}`,
                 type: seat.type,

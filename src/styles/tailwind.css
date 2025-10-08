@@ -2,265 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide scrollbars globally */
 * {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 *::-webkit-scrollbar {
-  display: none; /* WebKit */
+    display: none;
 }
 
-/* Ensure no scrollbars on body and html */
-html, body {
-  overflow-x: hidden;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-}
-
-/* Distinctive body background for light mode */
+html,
 body {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* Dark mode body background */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    min-height: 100vh;
+}
+
 .dark body {
-  background: #0f172a;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
 }
 
-html::-webkit-scrollbar, body::-webkit-scrollbar {
-  display: none; /* WebKit */
-}
 
-/* Utility classes - no-scrollbar now handled by MUI Container theme */
-
-@layer components {
-    /* Dark Mode Conditional Classes */
-    .text-primary-dark {
-        @apply dark:text-white text-gray-900;
-    }
-    
-    .text-muted-dark {
-        @apply dark:text-gray-400 text-gray-500;
-    }
-    
-    .bg-surface-dark {
-        @apply dark:bg-gray-800 bg-gray-50;
-    }
-    
-    .bg-button-dark {
-        @apply dark:bg-gray-700 bg-gray-100;
-    }
-    
-    .text-button-dark {
-        @apply dark:text-white text-gray-700;
-    }
-    
-    .border-button-dark {
-        @apply dark:border-gray-600 border-gray-300;
-    }
-    
-    .bg-chip-dark {
-        @apply dark:bg-white/20 bg-gray-200;
-    }
-    
-    .text-chip-dark {
-        @apply dark:text-white text-gray-700;
-    }
-    
-    .border-chip-dark {
-        @apply dark:border-white/20 border-gray-300;
-    }
-    
-    .text-link-dark {
-        @apply dark:text-blue-400 text-primary;
-    }
-    
-    .border-link-dark {
-        @apply dark:border-blue-400 border-primary;
-    }
-    
-    .hover-link-dark {
-        @apply dark:hover:bg-blue-400/10 hover:bg-primary/10;
-    }
-
-    /* Essential Button Components */
-    .btn-primary {
-        @apply bg-blue-500 text-white font-medium text-sm px-4 py-2 rounded-full;
-        @apply hover:bg-blue-600 transition-colors duration-200;
-        @apply disabled:bg-gray-400 disabled:cursor-not-allowed;
-    }
-    
-    .btn-primary-small {
-        @apply bg-blue-500 text-white font-medium text-xs px-3 py-1 rounded-full h-6;
-        @apply hover:bg-blue-600 transition-colors duration-200;
-        @apply disabled:bg-gray-400 disabled:cursor-not-allowed;
-    }
-    
-    .btn-icon {
-        @apply w-10 h-10 rounded-full flex items-center justify-center;
-        @apply hover:bg-gray-100 transition-colors duration-200;
-    }
-
-    /* Essential Card Components */
-    .card-base {
-        @apply bg-white rounded-2xl p-4 shadow-sm border border-gray-200;
-        @apply dark:bg-slate-800 dark:border-slate-700;
-    }
-
-    /* Essential Typography Components */
-    .text-heading {
-        @apply font-jakarta font-semibold text-gray-900 dark:text-white;
-    }
-    
-    .text-body {
-        @apply font-jakarta text-gray-600 dark:text-gray-300;
-    }
-    
-    .text-caption {
-        @apply font-jakarta text-xs text-gray-500 dark:text-gray-400;
-    }
-    
-    .text-primary {
-        @apply text-blue-500 dark:text-blue-400;
-    }
-
-    /* Essential Layout Components */
-    .container-mobile {
-        @apply w-[375px] mx-auto;
-    }
-    
-    .flex-center {
-        @apply flex items-center justify-center;
-    }
-    
-    .flex-between {
-        @apply flex items-center justify-between;
-    }
-
-    /* Essential Icon + Text Combinations */
-    .icon-text {
-        @apply flex items-center gap-2;
-    }
-
-    /* Essential Form Components */
-
-    /* Essential Navigation Components */
-    .nav-item {
-        @apply flex flex-col items-center cursor-pointer;
-        @apply hover:opacity-80 transition-opacity duration-200;
-    }
-    
-    .nav-item-active {
-        @apply flex flex-col items-center cursor-pointer;
-        @apply text-blue-500 dark:text-blue-400;
-    }
-
-    /* Essential Dark Mode Utilities */
-    .bg-card {
-        @apply bg-white dark:bg-slate-800;
-    }
-    
-    .text-primary {
-        @apply text-gray-900 dark:text-white;
-    }
-    
-    .text-secondary {
-        @apply text-gray-600 dark:text-gray-300;
-    }
-    
-    .border-primary {
-        @apply border-gray-200 dark:border-slate-700;
-    }
-    
-    /* EventCard Component Classes */
-    .btn-event-card {
-        @apply rounded-full font-jakarta text-xs normal-case h-6 text-white;
-    }
-    
-    .btn-event-card-full {
-        @apply bg-gray-400;
-    }
-    
-    .btn-event-card-primary {
-        @apply bg-primary;
-    }
-    
-    .btn-event-card-disabled {
-        @apply bg-gray-400 cursor-not-allowed;
-    }
-    
-    .btn-event-card-cancel {
-        @apply bg-red-600 hover:bg-red-700;
-    }
-    
-    .btn-event-card-leave {
-        @apply bg-orange-600 hover:bg-orange-700;
-    }
-    
-    .btn-event-card-favorite {
-        @apply rounded-lg transition-all duration-300 hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50;
-    }
-    
-    .btn-event-card-outline {
-        @apply border border-primary text-primary bg-transparent hover:bg-primary hover:text-white;
-    }
-    
-    .text-event-title {
-        @apply text-xs font-semibold font-jakarta;
-    }
-    
-    .text-event-title-dark {
-        @apply text-white dark:text-white;
-    }
-    
-    .text-event-title-light {
-        @apply text-gray-900 dark:text-white;
-    }
-    
-    .text-event-price {
-        @apply text-xs font-semibold font-jakarta;
-    }
-    
-    .text-event-price-dark {
-        @apply text-white dark:text-white;
-    }
-    
-    .text-event-price-light {
-        @apply text-gray-900 dark:text-white;
-    }
-    
-    .text-event-meta {
-        @apply text-xs font-medium font-jakarta;
-    }
-    
-    .text-event-meta-primary {
-        @apply text-blue-400 dark:text-blue-400;
-    }
-    
-    .text-event-meta-light {
-        @apply text-primary dark:text-blue-400;
-    }
-    
-    .chip-event {
-        @apply h-5 text-xs;
-    }
-    
-    .chip-event-absolute {
-        @apply absolute left-2 top-2 text-white bg-primary;
-    }
-    
-    .chip-event-inline {
-        @apply flex-shrink-0;
-    }
-    
-    .chip-event-dark {
-        @apply bg-primary text-white;
-    }
-    
-    .chip-event-light {
-        @apply bg-primary/15 text-primary;
-    }
-}

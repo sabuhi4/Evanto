@@ -1,15 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ButtonGroup, IconButton, Typography, Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Container } from '@mui/material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 import { BottomAppBar } from "../../components/navigation/BottomAppBar";
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { PageHeader } from '@/components/layout/PageHeader';
-import toast from "react-hot-toast";
+import { showSuccess, showError } from '@/utils/notifications';
 import { useNavigate } from 'react-router-dom';
 import { type Booking } from "@/utils/schemas";
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
-import { useUpdateBooking, useBookings } from "@/hooks/entityConfigs";
+import { useUpdateBooking, useBookings } from "@/hooks/useData";
 import { formatSmartDate } from "@/utils/format";
 import { usePagination } from "@/hooks/usePagination";
 import TicketCard from "../../components/cards/TicketCard";
@@ -23,7 +24,8 @@ function Tickets() {
     const { getVisibleItems, loadMore, hasMore, getRemainingCount, reset } = usePagination();
     const queryClient = useQueryClient();
     const updateBookingStatusMutation = useUpdateBooking();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
+    const { user: authUser } = useUserStore();
 
     // Use unified data fetching
     const { data: items = [] } = useUnifiedItems();
@@ -87,13 +89,13 @@ function Tickets() {
             { id: ticketToCancel, data: { status: 'cancelled' } },
             {
                 onSuccess: () => {
-                    toast.success('Ticket cancelled successfully!');
+                    showSuccess('Ticket cancelled successfully!');
                     setCancelDialogOpen(false);
                     setTicketToCancel(null);
                 },
                 onError: (error) => {
                     console.error('Error cancelling ticket:', error);
-                    toast.error('Failed to cancel ticket. Please try again.');
+                    showError('Failed to cancel ticket. Please try again.');
                 }
             }
         );
@@ -137,8 +139,37 @@ function Tickets() {
 
     const isLoading = bookingsLoading;
 
+    // Guest mode check - show sign-in prompt if no user
+    if (!authUser) {
+        return (
+            <>
+                <Box className='absolute right-4 top-4 z-10'>
+                    <ThemeToggle />
+                </Box>
+                <Container className='relative min-h-screen flex items-center justify-center'>
+                    <Box className="flex flex-col items-center gap-4 text-center">
+                        <Typography variant="h5" className="font-semibold text-blue-500 dark:text-blue-400">
+                            Please sign in to view your tickets
+                        </Typography>
+                        <Button 
+                            onClick={() => navigate('/auth/sign-in')} 
+                            variant='contained'
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold h-12 px-8"
+                        >
+                            Sign In
+                        </Button>
+                    </Box>
+                    <BottomAppBar />
+                </Container>
+            </>
+        );
+    }
+
     return (
         <>
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
+            </Box>
             <Container className='relative min-h-screen'>
                 <PageHeader 
                     title="Your Tickets"
@@ -234,7 +265,7 @@ function Tickets() {
                     ))
                 ) : (
                     <Box className='text-center py-12'>
-                        <Typography variant='h6' className='text-text-3 mb-4'>
+                        <Typography variant='h6' className={`${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'} mb-4`}>
                             No tickets found
                         </Typography>
                     </Box>

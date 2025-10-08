@@ -10,14 +10,15 @@ import { useBookingStore } from '@/store/bookingStore';
 import { useDataStore } from '@/store/dataStore';
 import { showError } from '@/utils/notifications';
 import { bookingFormSchema, type BookingFormData } from '@/utils/schemas';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 function BookEvent() {
     const navigate = useNavigate();
     const { id: itemId } = useParams();
     const { bookingData } = useBookingStore();
     const setBookingData = useBookingStore(state => state.setBookingData);
-    const { isDarkMode, toggleDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
+    const toggleDarkMode = useUserStore(state => state.toggleDarkMode);
     
     const [searchCountry, setSearchCountry] = useState('');
     const [selectedCountry, setSelectedCountry] = useState('');
@@ -418,7 +419,7 @@ function BookEvent() {
                     error={!!errors.email}
                     helperText={errors.email?.message}
                     InputProps={{
-                        startAdornment: <EmailOutlined className={`mr-1 ${isDarkMode ? 'text-muted' : 'text-muted'}`} />,
+                        startAdornment: <EmailOutlined className={`mr-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />,
                     }}
                 />
                 <TextField
@@ -427,7 +428,7 @@ function BookEvent() {
                     error={!!errors.phone}
                     helperText={errors.phone?.message}
                     InputProps={{
-                        startAdornment: <FlagRounded className={`mr-1 ${isDarkMode ? 'text-muted' : 'text-muted'}`} />,
+                        startAdornment: <FlagRounded className={`mr-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />,
                     }}
                 />
                 
@@ -449,7 +450,7 @@ function BookEvent() {
                         error={!!errors.country}
                         helperText={errors.country?.message}
                         InputProps={{
-                            startAdornment: <Search className={`mr-1 ${isDarkMode ? 'text-muted' : 'text-muted'}`} />,
+                            startAdornment: <Search className={`mr-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />,
                         }}
                     />
             
@@ -463,7 +464,7 @@ function BookEvent() {
                                     size="small"
                                     fullWidth
                                     InputProps={{
-                                        startAdornment: <Search className={`mr-1 ${isDarkMode ? 'text-muted' : 'text-muted'}`} />,
+                                        startAdornment: <Search className={`mr-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />,
                                     }}
                                 />
                             </Box>
@@ -488,12 +489,12 @@ function BookEvent() {
                         {...register('accept_terms')}
                         size='small' 
                         color='primary'
-                        className={isDarkMode ? 'text-primary' : 'text-primary'}
+                        className="text-blue-500"
                     />
-                    <Typography variant='body2' className={`ml-2 font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-muted'}`}>
+                    <Typography variant='body2' className={`ml-2 font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         I accept the evanto{' '}
-                        <span className={isDarkMode ? 'text-blue-400' : 'text-primary'}>Terms of services. Community guideline</span>, and{' '}
-                        <span className={isDarkMode ? 'text-blue-400' : 'text-primary'}> Privacy Policy</span> (Required)
+                        <span className="text-blue-500">Terms of services. Community guideline</span>, and{' '}
+                        <span className="text-blue-500"> Privacy Policy</span> (Required)
                     </Typography>
                 </Box>
                 {errors.accept_terms && (
@@ -516,3 +517,4 @@ function BookEvent() {
 }
 
 export default BookEvent;
+

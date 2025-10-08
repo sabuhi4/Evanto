@@ -1,6 +1,5 @@
-import { useGeoStore } from '@/store/geoStore';
+import { useUserStore } from '@/store/userStore';
 
-// Reverse geocoding function
 export async function reverseGeocode(lat: number, lng: number): Promise<Record<string, string> | null> {
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
@@ -12,9 +11,8 @@ export async function reverseGeocode(lat: number, lng: number): Promise<Record<s
   }
 }
 
-// Location detection function
 export async function detectUserLocation() {
-  const { setCity, setCountry, setError } = useGeoStore.getState();
+  const { setCity, setCountry, setError } = useUserStore.getState();
 
   if (!navigator.geolocation) {
     setError('Geolocation not supported');
@@ -28,10 +26,10 @@ export async function detectUserLocation() {
       if (address) {
         setError(null);
         setCity(address.city || address.town || address.village || null);
-        setCountry(address.country || null);
+        // Use state/province if available, otherwise use country
+        setCountry(address.state || address.country || null);
       } else {
         setError('Reverse geocoding failed');
-        // Use a simple error notification instead of importing from notifications
         console.error('Could not detect location!');
       }
     },

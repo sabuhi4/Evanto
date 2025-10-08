@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { supabase } from '@/utils/supabase';
 import { Box, Link, Typography, Button, CircularProgress, IconButton } from '@mui/material';
 import { KeyboardArrowLeft } from '@mui/icons-material';
@@ -38,7 +38,7 @@ export const VerifyCode = () => {
 
         setIsSubmitting(false);
         if (error) {
-            toast.error(error.message);
+            showError(error.message);
         } else {
             navigate('/auth/reset-password');
         }
@@ -56,9 +56,9 @@ export const VerifyCode = () => {
         });
 
         if (error) {
-            toast.error(error.message);
+            showError(error.message);
         } else {
-            toast.success('New verification code sent!');
+            showSuccess('New verification code sent!');
             setCooldown(RESEND_COOLDOWN);
         }
     };
@@ -78,9 +78,9 @@ export const VerifyCode = () => {
                     <Box className="w-10" />
                 </Box>
                 
-                <Box className="auth-container">
+                <Box className="flex flex-col gap-6 text-start">
                     <Typography variant="body1" className="mb-8 text-center">
-                        Please enter the verification code we sent to your email <span className="text-primary font-medium">{email}</span>
+                        Please enter the verification code we sent to your email <span className="text-blue-500 font-medium">{email}</span>
                     </Typography>
 
                     <Box className="flex flex-col space-y-6">
@@ -115,7 +115,7 @@ export const VerifyCode = () => {
                             Didn't receive it?{' '}
                             <Link
                                 onClick={handleResend}
-                                className={`text-primary cursor-pointer ${cooldown > 0 ? 'opacity-50 pointer-events-none' : ''}`}
+                                className={`text-blue-500 cursor-pointer ${cooldown > 0 ? 'opacity-50 pointer-events-none' : ''}`}
                             >
                                 {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend Code'}
                             </Link>

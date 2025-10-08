@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Box, Button, Chip, Container, Slider, Stack, Typography } from '@mui/material';
 import { useFiltersStore } from '@/store/filtersStore';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { LocationPicker } from '@/components/forms/LocationPicker';
 
 interface FilterModalProps {
@@ -10,7 +10,7 @@ interface FilterModalProps {
 }
 
 export const FilterModal = ({ open, onClose }: FilterModalProps) => {
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const {
         categories,
         categoryFilter,
@@ -155,3 +155,4 @@ export const FilterModal = ({ open, onClose }: FilterModalProps) => {
         </Modal>
     );
 }
+

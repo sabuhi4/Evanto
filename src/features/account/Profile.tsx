@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, IconButton, Typography, Avatar, Badge, Divider, List, ListItem, ListItemIcon, ListItemText, Switch, TextField, DialogTitle, DialogContent, DialogActions, Menu, MenuItem, Dialog } from '@mui/material';
+import { Box, Button, IconButton, Typography, Avatar, Badge, Divider, List, ListItem, ListItemIcon, ListItemText, Switch, TextField, DialogTitle, DialogContent, DialogActions, Menu, MenuItem } from '@mui/material';
 import { MoreVertOutlined, Edit, PersonOutlineOutlined, ChevronRight, StoreOutlined, Visibility, Save, Cancel, ImageOutlined, LogoutOutlined, SettingsOutlined, PaymentOutlined, InfoOutlined, ShieldOutlined, LockOutlined } from '@mui/icons-material';
 import { Container } from '@mui/material';
 import { BottomAppBar } from "@/components/navigation/BottomAppBar";
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { supabase } from "@/utils/supabase";
 import { useUserStore } from "@/store/userStore";
 import { showSuccess, showError } from '@/utils/notifications';
-import { useUser, useUpdateUser, useUserStats } from '@/hooks/entityConfigs';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUser, useUpdateUser, useUserStats } from '@/hooks/useData';
 import { getAvatarProps } from '@/utils/avatarUtils';
 import { LocationPicker } from '@/components/forms/LocationPicker';
+// Removed darkModeColors import - using Tailwind classes instead
+import { ContainerDialog } from '@/components/dialogs/ContainerDialog';
 
 interface ProfileAvatarProps {
     src?: string;
@@ -39,7 +41,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ src, size, onEditClick })
                 <IconButton
                     size='small'
                     onClick={onEditClick}
-                    className="bg-primary hover:bg-primary-dark border-2 border-white"
+                    className="bg-blue-500 hover:bg-blue-600 border-2 border-white"
                 >
                     <Edit className="text-sm text-white" />
                 </IconButton>
@@ -54,9 +56,8 @@ export const Profile = () => {
     const navigate = useNavigate();
     const { user: authUser, setUser } = useUserStore();
     const { data: user, isLoading: userLoading } = useUser(authUser?.id || '');
-    const { data: stats, isLoading: statsLoading } = useUserStats(authUser?.id);
+    const { data: stats, isLoading: statsLoading } = useUserStats(authUser?.id || '');
     const updateUserMutation = useUpdateUser();
-    const { isDarkMode } = useDarkMode();
     const [profile, setProfile] = useState<any>(null);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [photoEditDialogOpen, setPhotoEditDialogOpen] = useState(false);
@@ -268,8 +269,8 @@ export const Profile = () => {
         });
     };
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setMenuAnchorEl(event.currentTarget);
+    const handleMenuOpen = () => {
+        setMenuAnchorEl(document.activeElement as HTMLElement);
     };
 
     const handleMenuClose = () => {
@@ -316,27 +317,36 @@ export const Profile = () => {
     
     if (!displayUser) {
         return (
-            <Container className="relative min-h-screen flex items-center justify-center">
-                <Box className="flex flex-col items-center gap-4 text-center">
-                    <Typography variant="h5" className="font-jakarta font-semibold text-primary">
-                        Please sign in to view profile
-                    </Typography>
-                    <Button 
-                        onClick={() => navigate('/auth/sign-in')} 
-                        variant='contained'
-                        className="bg-primary text-white font-jakarta font-semibold h-12 px-8"
-                    >
-                        Sign In
-                    </Button>
+            <>
+                <Box className='absolute right-4 top-4 z-10'>
+                    <ThemeToggle />
                 </Box>
-                <BottomAppBar />
-            </Container>
+                <Container className="relative min-h-screen flex items-center justify-center">
+                    <Box className="flex flex-col items-center gap-4 text-center">
+                        <Typography variant="h5" className="font-semibold text-blue-500 dark:text-blue-400">
+                            Please sign in to view profile
+                        </Typography>
+                        <Button 
+                            onClick={() => navigate('/auth/sign-in')} 
+                            variant='contained'
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold h-12 px-8"
+                        >
+                            Sign In
+                        </Button>
+                    </Box>
+                    <BottomAppBar />
+                </Container>
+            </>
         );
     }
 
     return (
         <>
-            <Container className='relative min-h-screen pb-32'>
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
+            </Box>
+            <Container className='relative min-h-screen'>
+            <Box className='no-scrollbar w-full overflow-y-auto'>
                 <PageHeader 
                     title="Profile"
                     showBackButton={true}
@@ -352,141 +362,132 @@ export const Profile = () => {
                     size={100}
                     onEditClick={handlePhotoEdit}
                 />
-                <Typography variant='h4' className={`mt-2 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+                <Typography variant='h4' className='mt-2 font-semibold text-gray-900 dark:text-white'>
                     {profile?.full_name || user?.full_name || user?.email?.split('@')[0] || 'User'}
                 </Typography>
-                <Typography variant='body2' className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-jakarta`}>
+                <Typography variant='body2' className='text-gray-600 dark:text-gray-300'>
                     {profile?.bio || 'No bio added yet'}
                 </Typography>
                 {profile?.location && (
-                    <Typography variant='body2' className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} mt-1 mb-4 font-jakarta`}>
+                    <Typography variant='body2' className='text-body-secondary mt-1 mb-4'>
                         📍 {profile.location}
                     </Typography>
                 )}
             </Box>
 
-            <Box className='grid h-20 w-full grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-center rounded-2xl bg-neutral-50 dark:bg-gray-800'>
+            <Box className='grid h-24 w-full grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-center rounded-2xl py-5 bg-neutral-100 dark:bg-neutral-800'>
                 <Box className='text-center'>
-                    <Typography variant='h4' className='text-primary font-jakarta'>
+                    <Typography variant='h4' className='text-blue-500 dark:text-blue-400'>
                         {stats?.events_created || 0}
                     </Typography>
-                    <Typography variant='body2' className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-jakarta`}>
+                    <Typography variant='body2' className='text-gray-600 dark:text-gray-300'>
                         Events
                     </Typography>
                 </Box>
                 <Divider orientation='vertical' flexItem className='h-[40%] self-center' />
                 <Box className='text-center'>
-                    <Typography variant='h4' className='text-primary font-jakarta'>
+                    <Typography variant='h4' className='text-blue-500 dark:text-blue-400'>
                         {stats?.meetups_created || 0}
                     </Typography>
-                    <Typography variant='body2' className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-jakarta`}>
+                    <Typography variant='body2' className='text-gray-600 dark:text-gray-300'>
                         Meetups
                     </Typography>
                 </Box>
                 <Divider orientation='vertical' flexItem className='h-[40%] self-center' />
                 <Box className='text-center'>
-                    <Typography variant='h4' className='text-primary font-jakarta'>
+                    <Typography variant='h4' className='text-blue-500 dark:text-blue-400'>
                         {stats?.events_attending || 0}
                     </Typography>
-                    <Typography variant='body2' className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-jakarta`}>
+                    <Typography variant='body2' className='text-gray-600 dark:text-gray-300'>
                         Attending
                     </Typography>
                 </Box>
                 <Divider orientation='vertical' flexItem className='h-[40%] self-center' />
                 <Box className='text-center'>
-                    <Typography variant='h4' className='text-primary font-jakarta'>
+                    <Typography variant='h4' className='text-blue-500 dark:text-blue-400'>
                         {user?.user_interests?.length || 0}
                     </Typography>
-                    <Typography variant='body2' className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-jakarta`}>
+                    <Typography variant='body2' className='text-gray-600 dark:text-gray-300'>
                         Interests
                     </Typography>
                 </Box>
             </Box>
             
-            <Typography variant='h4' className={`self-start mt-6 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+            <Typography variant='h4' className='self-start mt-6 text-gray-900 dark:text-white'>
                 Account
             </Typography>
-            <Box className='w-full rounded-2xl bg-neutral-50 dark:bg-gray-800 mt-2'>
+            <Box className='w-full rounded-2xl bg-gray-50 dark:bg-gray-800 mt-2 bg-neutral-100'>
                 <List>
                     <ListItem component='button' onClick={handleManageEvents}>
                         <ListItemIcon>
-                            <StoreOutlined className='text-primary' />
+                            <StoreOutlined className='text-blue-500 dark:text-blue-400' />
                         </ListItemIcon>
-                        <ListItemText primary='Manage Events' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='Manage Events' className='text-gray-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                     <ListItem component='button' onClick={handleProfileEdit}>
                         <ListItemIcon>
-                            <PersonOutlineOutlined className='text-primary' />
+                            <PersonOutlineOutlined className='text-blue-500 dark:text-blue-400' />
                         </ListItemIcon>
-                        <ListItemText primary='Edit Profile' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='Edit Profile' className='text-gray-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                     <ListItem component='button' onClick={handlePaymentMethod}>
                         <ListItemIcon>
-                            <PaymentOutlined className='text-primary' />
+                            <PaymentOutlined className='text-blue-500 dark:text-blue-400' />
                         </ListItemIcon>
-                        <ListItemText primary='Payment Method' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='Payment Method' className='text-gray-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                     <ListItem component='button' onClick={handleSettings}>
                         <ListItemIcon>
-                            <SettingsOutlined className='text-primary' />
+                            <SettingsOutlined className='text-blue-500 dark:text-blue-400' />
                         </ListItemIcon>
-                        <ListItemText primary='Settings' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='Settings' className='text-gray-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                 </List>
             </Box>
 
-            <Typography variant='h4' className={`self-start mt-6 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
+            <Typography variant='h4' className='self-start mt-6 text-gray-900 dark:text-white'>
                 Social & Support
             </Typography>
-            <Box className='w-full rounded-2xl bg-neutral-50 dark:bg-gray-800 mt-2'>
+            <Box className='w-full rounded-2xl bg-gray-50 dark:bg-gray-800 mt-2 bg-neutral-100'>
                 <List>
                     <ListItem component='button' onClick={handleAbout}>
                         <ListItemIcon>
-                            <InfoOutlined className='text-primary' />
+                            <InfoOutlined className='text-blue-500 dark:text-blue-400' />
                         </ListItemIcon>
-                        <ListItemText primary='About Evanto' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='About Evanto' className='text-neutral-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                     <ListItem component='button' onClick={handleHelp}>
                         <ListItemIcon>
-                            <ShieldOutlined className='text-primary' />
+                            <ShieldOutlined className='text-primary dark:text-primary-light' />
                         </ListItemIcon>
-                        <ListItemText primary='Help & Support' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='Help & Support' className='text-neutral-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                     <ListItem component='button' onClick={handlePrivacy}>
                         <ListItemIcon>
-                            <LockOutlined className='text-primary' />
+                            <LockOutlined className='text-primary dark:text-primary-light' />
                         </ListItemIcon>
-                        <ListItemText primary='Privacy Policy' className={`${isDarkMode ? 'text-white' : 'text-neutral-900'}`} />
-                        <ChevronRight className='text-neutral-500' />
+                        <ListItemText primary='Privacy Policy' className='text-neutral-900 dark:text-white' />
+                        <ChevronRight className='text-gray-500 dark:text-gray-400' />
                     </ListItem>
                 </List>
             </Box>
 
-                <BottomAppBar />
-            </Container>
-
-            {/* Edit Profile Dialog */}
-            <Dialog 
+            
+            <ContainerDialog 
                 open={editDialogOpen} 
                 onClose={handleCancelEdit}
                 maxWidth={false}
                 fullWidth={false}
                 disableEnforceFocus
-                PaperProps={{
-                    style: {
-                        width: '375px',
-                        margin: 'auto'
-                    }
-                }}
             >
                 <DialogTitle 
-                    className={`text-xl font-semibold font-poppins pb-1 border-b border-divider ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}
+                    className='text-xl font-semibold font-poppins pb-1 border-b border-divider text-neutral-900 dark:text-white'
                 >
                     Edit Profile
                 </DialogTitle>
@@ -505,7 +506,6 @@ export const Profile = () => {
                             value={editForm.full_name}
                             onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
                             fullWidth
-                            className="text-input"
                             size="medium"
                         />
                         <TextField
@@ -521,7 +521,7 @@ export const Profile = () => {
                         <Box className="flex flex-col gap-2">
                             <Typography 
                                 variant="subtitle1" 
-                                className={`self-start font-semibold font-poppins ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}
+                                className="self-start font-semibold"
                             >
                                 Location
                             </Typography>
@@ -534,7 +534,7 @@ export const Profile = () => {
                         <Box className="flex flex-col gap-3">
                             <Typography 
                                 variant="subtitle1" 
-                                className={`font-semibold font-poppins ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}
+                                className="font-semibold"
                             >
                                 Interests
                             </Typography>
@@ -569,7 +569,7 @@ export const Profile = () => {
                         <Box className="flex flex-col items-center gap-4">
                             <Typography 
                                 variant="subtitle1" 
-                                className={`self-start font-semibold font-poppins ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}
+                                className="self-start font-semibold"
                             >
                                 Profile Photo
                             </Typography>
@@ -629,7 +629,6 @@ export const Profile = () => {
                             {selectedPhoto && (
                                 <Typography 
                                     variant="caption" 
-                                    className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-poppins`}
                                     sx={{ 
                                         fontSize: '0.75rem',
                                         textAlign: 'center',
@@ -670,21 +669,15 @@ export const Profile = () => {
                         {updateUserMutation.isPending ? 'Saving...' : 'Save'}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </ContainerDialog>
 
-            {/* Photo Edit Dialog */}
-            <Dialog 
+            
+            <ContainerDialog 
                 open={photoEditDialogOpen} 
                 onClose={handleCancelPhotoEdit}
                 maxWidth={false}
                 fullWidth={false}
                 disableEnforceFocus
-                PaperProps={{
-                    style: {
-                        width: '375px',
-                        margin: 'auto'
-                    }
-                }}
             >
                 <DialogTitle>Edit Profile Photo</DialogTitle>
                 <DialogContent sx={{ 
@@ -736,7 +729,7 @@ export const Profile = () => {
                         </Button>
                         
                         {selectedPhoto && (
-                            <Typography variant="caption" className={`${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'} font-poppins`}>
+                            <Typography variant="caption" className={`text-neutral-700 dark:text-neutral-300 font-poppins`}>
                                 Selected: {selectedPhoto.name}
                             </Typography>
                         )}
@@ -760,7 +753,7 @@ export const Profile = () => {
                         {updateUserMutation.isPending ? 'Saving...' : 'Save Photo'}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </ContainerDialog>
 
             {/* Profile Menu */}
             <Menu
@@ -790,8 +783,11 @@ export const Profile = () => {
                     <ListItemText>Logout</ListItemText>
                 </MenuItem>
             </Menu>
-
+            </Box>
+            <BottomAppBar />
+            </Container>
         </>
     );
-}
+};
+
 

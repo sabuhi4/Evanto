@@ -10,7 +10,7 @@ import {
     Box,
 } from '@mui/material';
 import { MyLocation, Search } from '@mui/icons-material';
-import { useGeoStore } from '@/store/geoStore';
+import { useUserStore } from '@/store/userStore';
 import { reverseGeocode } from '@/utils/geo';
 
 interface NominatimResult {
@@ -25,7 +25,7 @@ interface LocationPickerProps {
 }
 
 export const LocationPicker: React.FC<LocationPickerProps> = ({ value, onChange, error, helperText }) => {
-    const { setCity, setLocation, setError } = useGeoStore();
+    const { setCity, setLocation, setError } = useUserStore();
     const [internalValue, setInternalValue] = useState(value ?? '');
     const [loading, setLoading] = useState(false);
     const [suggestions, setSuggestions] = useState<string[]>([]);

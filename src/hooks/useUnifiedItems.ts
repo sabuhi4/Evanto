@@ -1,17 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/queryClient';
 import { getAllItems, getItemById } from '@/services';
-import type { UnifiedItem } from '@/utils/schemas';
 
-// Simplified unified hook using the new service functions
+const STALE_TIME_SHORT = 2 * 60 * 1000;
+const STALE_TIME_LONG = 5 * 60 * 1000;
+const MAX_RETRIES = 2;
+
 export const useUnifiedItems = (filters?: Record<string, any>) => {
   const query = useQuery({
-    queryKey: queryKeys.items.list(filters || {}),
+    queryKey: ['unified-items', filters || {}],
     queryFn: getAllItems,
-    staleTime: 2 * 60 * 1000,
-    retry: (failureCount, error) => {
-      return failureCount < 2; // Only retry twice
-    },
+    staleTime: STALE_TIME_SHORT,
+    retry: (failureCount) => failureCount < MAX_RETRIES,
   });
 
   return {
@@ -23,13 +22,13 @@ export const useUnifiedItems = (filters?: Record<string, any>) => {
   };
 };
 
-// Simplified hook for single item using the new service function
 export const useUnifiedItem = (id: string, type: 'event' | 'meetup') => {
   const query = useQuery({
-    queryKey: queryKeys.items.detail(id),
+    queryKey: ['unified-item', id, type],
     queryFn: () => getItemById(id, type),
     enabled: !!id && !!type,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STALE_TIME_LONG,
+    retry: (failureCount) => failureCount < MAX_RETRIES,
   });
 
   return {

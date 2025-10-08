@@ -3,31 +3,26 @@ import { Box, Typography, Stepper, Step, StepLabel, Button } from '@mui/material
 import { Container } from '@mui/material';
 import Onboarding1 from '/illustrations/onboarding1.png';
 import { useNavigate } from 'react-router-dom';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 function OnboardingStep1() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     
     return (
         <Container className="relative min-h-screen">
-            
-            {/* Main content area */}
             <Box className='flex-1 flex flex-col justify-center w-full'>
-                {/* Illustration */}
                 <Box className='flex justify-center mb-8 w-full'>
                     <img src={Onboarding1} alt='Onboarding' className='h-48 w-48' />
                 </Box>
                 
-                {/* Heading */}
                 <Typography 
                     variant="h4"
-                    className={`font-jakarta font-bold mb-4 text-left w-full ${isDarkMode ? 'text-white' : 'text-primary'}`}
+                    className={`font-jakarta font-bold mb-4 text-left w-full ${isDarkMode ? 'text-white' : 'text-blue-500'}`}
                 >
                     This is the perfect time to visit your favorite event!
                 </Typography>
                 
-                {/* Body text */}
                 <Typography 
                     variant="body1"
                     className={`font-jakarta mb-6 text-left w-full ${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'}`}
@@ -35,7 +30,6 @@ function OnboardingStep1() {
                     Take stock of your performance and inspire yourself to reach even greater heights.
                 </Typography>
                 
-                {/* MUI Stepper - 3 steps total */}
                 <Box className='flex justify-center mb-8 w-full'>
                     <Stepper 
                         activeStep={0} 
@@ -49,37 +43,34 @@ function OnboardingStep1() {
                             }
                         }}
                     >
-                        <Step onClick={() => navigate('/onboarding/step1')}>
+                        <Step onClick={() => navigate('/onboarding/step-1')}>
                             <StepLabel />
                         </Step>
-                        <Step onClick={() => navigate('/onboarding/step2')}>
+                        <Step onClick={() => navigate('/onboarding/step-2')}>
                             <StepLabel />
                         </Step>
-                        <Step onClick={() => navigate('/onboarding/step3')}>
+                        <Step onClick={() => navigate('/onboarding/step-3')}>
                             <StepLabel />
                         </Step>
                     </Stepper>
                 </Box>
             </Box>
             
-            {/* Bottom section with button and skip link */}
             <Box className='w-full pb-8'>
-                {/* Primary button */}
                 <Button
                     variant="contained"
                     size="large"
                     fullWidth
-                    onClick={() => navigate('/onboarding/step2')}
-                    className="bg-primary text-white font-jakarta font-semibold mb-4 h-12"
+                    onClick={() => navigate('/onboarding/step-2')}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-jakarta font-semibold mb-4 h-12"
                 >
                     Got it, Next
                 </Button>
             
-                {/* Skip link */}
                 <Box className='text-center w-full'>
                     <Typography 
                         variant="caption"
-                        className={`font-jakarta cursor-pointer ${isDarkMode ? 'text-white' : 'text-primary'}`}
+                        className={`font-jakarta cursor-pointer ${isDarkMode ? 'text-white' : 'text-blue-500'}`}
                         onClick={() => navigate('/home')}
                     >
                         Skip
@@ -91,3 +82,4 @@ function OnboardingStep1() {
 }
 
 export default OnboardingStep1;
+

@@ -1,137 +1,117 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/guards/ProtectedRoute';
+import { PublicRoute } from '@/components/guards/PublicRoute';
 
-// Auth Components
-import AuthCallback from '@/AuthCallback';
-import SignIn from '@/features/auth/SignIn';
-import SignUp from '@/features/auth/SignUp';
-import ForgotPassword from '@/features/auth/ForgotPassword';
-import EmailSent from '@/features/auth/EmailSent';
-import VerifyCode from '@/features/auth/VerifyCode';
-import ResetPassword from '@/features/auth/ResetPassword';
+const SignIn = lazy(() => import('@/features/auth/SignIn').then(module => ({ default: module.SignIn })));
+const SignUp = lazy(() => import('@/features/auth/SignUp').then(module => ({ default: module.SignUp })));
+const ForgotPassword = lazy(() => import('@/features/auth/ForgotPassword'));
+const EmailSent = lazy(() => import('@/features/auth/EmailSent'));
+const VerifyCode = lazy(() => import('@/features/auth/VerifyCode').then(module => ({ default: module.VerifyCode })));
+const ResetPassword = lazy(() => import('@/features/auth/ResetPassword'));
 
-// Onboarding Components
-import SplashScreen from '@/features/onboarding/SplashScreen';
-import OnboardingStep1 from '@/features/onboarding/OnboardingStep1';
-import OnboardingStep2 from '@/features/onboarding/OnboardingStep2';
-import OnboardingStep3 from '@/features/onboarding/OnboardingStep3';
-import Welcome from '@/features/Welcome';
-import ChooseYourInterests from '@/features/onboarding/ChooseYourInterests';
-import Congratulation from '@/features/onboarding/Congratulation';
+const SplashScreen = lazy(() => import('@/features/onboarding/SplashScreen').then(module => ({ default: module.SplashScreen })));
+const OnboardingStep1 = lazy(() => import('@/features/onboarding/OnboardingStep1'));
+const OnboardingStep2 = lazy(() => import('@/features/onboarding/OnboardingStep2'));
+const OnboardingStep3 = lazy(() => import('@/features/onboarding/OnboardingStep3'));
+const Welcome = lazy(() => import('@/features/Welcome'));
+const ChooseYourInterests = lazy(() => import('@/features/onboarding/ChooseYourInterests'));
+const Congratulation = lazy(() => import('@/features/onboarding/Congratulation'));
 
-// Event Components
-import CreateEvent from '@/features/events/CreateEvent';
-import EventDetails from '@/features/events/EventDetails';
-import UpdateEvent from '@/features/events/UpdateEvent';
-import ManageEvents from '@/features/events/ManageEvents';
+const CreateEvent = lazy(() => import('@/features/events/CreateEvent'));
+const EventDetails = lazy(() => import('@/features/events/EventDetails'));
+const UpdateEvent = lazy(() => import('@/features/events/UpdateEvent'));
+const ManageEvents = lazy(() => import('@/features/events/ManageEvents'));
 
-// Meetup Components
-import CreateMeetupStep1 from '@/features/meetups/CreateMeetupStep1';
-import CreateMeetupStep2 from '@/features/meetups/CreateMeetupStep2';
-import CreateMeetupStep3 from '@/features/meetups/CreateMeetupStep3';
+const CreateMeetupStep1 = lazy(() => import('@/features/meetups/CreateMeetupStep1'));
+const CreateMeetupStep2 = lazy(() => import('@/features/meetups/CreateMeetupStep2'));
+const CreateMeetupStep3 = lazy(() => import('@/features/meetups/CreateMeetupStep3'));
 
-// Main App Components
-import Home from '@/features/Home';
-import Search from '@/features/Search';
-import Favorites from '@/features/Favorites';
-import UpcomingEvent from '@/features/UpcomingEvent';
+const Home = lazy(() => import('@/features/Home'));
+const Search = lazy(() => import('@/features/Search'));
+const Favorites = lazy(() => import('@/features/Favorites'));
+const UpcomingEvent = lazy(() => import('@/features/UpcomingEvent'));
 
-// Booking Flow Components
-import BookEvent from '@/features/bookings/BookEvent';
-import SelectSeats from '@/features/bookings/SelectSeats';
-import Summary from '@/features/bookings/Summary';
+const BookEvent = lazy(() => import('@/features/bookings/BookEvent'));
+const SelectSeats = lazy(() => import('@/features/bookings/SelectSeats'));
+const Summary = lazy(() => import('@/features/bookings/Summary'));
 
-// Ticket Components
-import Ticket from '@/features/tickets/Tickets';
-import TicketDetails from '@/features/tickets/TicketDetails';
+const Ticket = lazy(() => import('@/features/tickets/Tickets'));
+const TicketDetails = lazy(() => import('@/features/tickets/TicketDetails'));
 
-// Payment Components
-import CreateCard from '@/features/payments/CreateCard';
-import PaymentDetails from '@/features/payments/PaymentDetails';
+const CreateCard = lazy(() => import('@/features/payments/CreateCard'));
+const PaymentDetails = lazy(() => import('@/features/payments/PaymentDetails'));
 
-// Profile Components
-import { Profile } from '@/features/account/Profile';
-import { Settings } from '@/features/account/Settings';
-import Language from '@/features/profile/Language';
-import Notification from '@/features/profile/Notification';
-import ChangePassword from '@/features/profile/ChangePassword';
+const Profile = lazy(() => import('@/features/account/Profile').then(module => ({ default: module.Profile })));
+const Settings = lazy(() => import('@/features/account/Settings').then(module => ({ default: module.Settings })));
+const Language = lazy(() => import('@/features/profile/Language'));
+const Notification = lazy(() => import('@/features/profile/Notification'));
+const ChangePassword = lazy(() => import('@/features/profile/ChangePassword'));
 
-// Support Components
-import Help from '@/features/support/Help';
-import Privacy from '@/features/support/Privacy';
-import About from '@/features/support/About';
+const Help = lazy(() => import('@/features/support/Help'));
+const Privacy = lazy(() => import('@/features/support/Privacy'));
+const About = lazy(() => import('@/features/support/About'));
 
-// Development Components
-import Test from '@/features/Test';
+const LoadingSpinner = () => (
+    <div className="flex-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+);
 
 export const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* Auth Routes */}
-      <Route path='/auth/callback' element={<AuthCallback />} />
-      <Route path='/auth/sign-in' element={<SignIn />} />
-      <Route path='/auth/sign-up' element={<SignUp />} />
-      <Route path='/auth/forgot-password' element={<ForgotPassword />} />
-      <Route path='/auth/email-sent' element={<EmailSent />} />
-      <Route path='/auth/verify-code' element={<VerifyCode />} />
-      <Route path='/auth/reset-password' element={<ResetPassword />} />
+    return (
+        <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+                <Route path="/" element={<SplashScreen />} />
+                
+                <Route path="/auth/sign-in" element={<PublicRoute><SignIn /></PublicRoute>} />
+                <Route path="/auth/sign-up" element={<PublicRoute><SignUp /></PublicRoute>} />
+                <Route path="/auth/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+                <Route path="/auth/email-sent" element={<PublicRoute><EmailSent /></PublicRoute>} />
+                <Route path="/auth/verify-code" element={<PublicRoute><VerifyCode /></PublicRoute>} />
+                <Route path="/auth/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
-      {/* Onboarding Routes */}
-      <Route path='/onboarding/splash' element={<SplashScreen />} />
-      <Route path='/onboarding/step-1' element={<OnboardingStep1 />} />
-      <Route path='/onboarding/step-2' element={<OnboardingStep2 />} />
-      <Route path='/onboarding/step-3' element={<OnboardingStep3 />} />
-      <Route path='/welcome' element={<Welcome />} />
-      <Route path='/onboarding/interests' element={<ChooseYourInterests />} />
-      <Route path='/onboarding/congratulations' element={<Congratulation />} />
+                <Route path="/onboarding/step-1" element={<PublicRoute><OnboardingStep1 /></PublicRoute>} />
+                <Route path="/onboarding/step-2" element={<PublicRoute><OnboardingStep2 /></PublicRoute>} />
+                <Route path="/onboarding/step-3" element={<PublicRoute><OnboardingStep3 /></PublicRoute>} />
+                <Route path="/onboarding/interests" element={<PublicRoute><ChooseYourInterests /></PublicRoute>} />
+                <Route path="/onboarding/congratulations" element={<PublicRoute><Congratulation /></PublicRoute>} />
+                <Route path="/welcome" element={<PublicRoute><Welcome /></PublicRoute>} />
 
-      {/* Event Routes */}
-      <Route path='/events/create' element={<CreateEvent />} />
-      <Route path='/events/:id' element={<EventDetails />} />
-      <Route path='/events/:id/edit' element={<UpdateEvent />} />
-      <Route path='/events/manage' element={<ManageEvents />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/upcoming" element={<UpcomingEvent />} />
 
-      {/* Meetup Routes */}
-      <Route path='/meetups/create/step-1' element={<CreateMeetupStep1 />} />
-      <Route path='/meetups/create/step-2' element={<CreateMeetupStep2 />} />
-      <Route path='/meetups/create/step-3' element={<CreateMeetupStep3 />} />
+                <Route path="/events/create" element={<ProtectedRoute><CreateEvent /></ProtectedRoute>} />
+                <Route path="/events/:id" element={<EventDetails />} />
+                <Route path="/events/:id/edit" element={<ProtectedRoute><UpdateEvent /></ProtectedRoute>} />
+                <Route path="/events/manage" element={<ProtectedRoute><ManageEvents /></ProtectedRoute>} />
 
-      {/* Main App Routes */}
-      <Route path='/' element={<Home />} />
-      <Route path='/search' element={<Search />} />
-      <Route path='/favorites' element={<Favorites />} />
-      <Route path='/upcoming' element={<UpcomingEvent />} />
+                <Route path="/meetups/create/step-1" element={<ProtectedRoute><CreateMeetupStep1 /></ProtectedRoute>} />
+                <Route path="/meetups/create/step-2" element={<ProtectedRoute><CreateMeetupStep2 /></ProtectedRoute>} />
+                <Route path="/meetups/create/step-3" element={<ProtectedRoute><CreateMeetupStep3 /></ProtectedRoute>} />
 
-      {/* Booking Flow Routes */}
-      <Route path='/bookings/event/:id' element={<BookEvent />} />
-      <Route path='/bookings/select-seats' element={<SelectSeats />} />
-      <Route path='/bookings/summary' element={<Summary />} />
+                <Route path="/bookings/event/:id" element={<ProtectedRoute><BookEvent /></ProtectedRoute>} />
+                <Route path="/bookings/select-seats" element={<ProtectedRoute><SelectSeats /></ProtectedRoute>} />
+                <Route path="/bookings/summary" element={<ProtectedRoute><Summary /></ProtectedRoute>} />
 
-      {/* Ticket Routes */}
-      <Route path='/tickets' element={<Ticket />} />
-      <Route path='/tickets/:id' element={<TicketDetails />} />
+                <Route path="/tickets" element={<Ticket />} />
+                <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetails /></ProtectedRoute>} />
 
-      {/* Payment Routes */}
-      <Route path='/payments/cards' element={<CreateCard />} />
-      <Route path='/payments/details' element={<PaymentDetails />} />
+                <Route path="/payments/cards" element={<ProtectedRoute><CreateCard /></ProtectedRoute>} />
+                <Route path="/payments/details" element={<ProtectedRoute><PaymentDetails /></ProtectedRoute>} />
 
-      {/* Profile Routes */}
-      <Route path='/profile' element={<Profile />} />
-      <Route path='/profile/settings' element={<Settings />} />
-      <Route path='/profile/language' element={<Language />} />
-      <Route path='/profile/notifications' element={<Notification />} />
-      <Route path='/profile/change-password' element={<ChangePassword />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/profile/language" element={<ProtectedRoute><Language /></ProtectedRoute>} />
+                <Route path="/profile/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
+                <Route path="/profile/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
 
-      {/* Support Routes */}
-      <Route path='/help' element={<Help />} />
-      <Route path='/privacy' element={<Privacy />} />
-      <Route path='/about' element={<About />} />
-
-      {/* Development Routes */}
-      <Route path='/test' element={<Test />} />
-      
-      {/* Legacy redirects */}
-      <Route path='/main-page-1' element={<Home />} />
-    </Routes>
-  );
+                <Route path="/help" element={<Help />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/about" element={<About />} />
+            </Routes>
+        </Suspense>
+    );
 };

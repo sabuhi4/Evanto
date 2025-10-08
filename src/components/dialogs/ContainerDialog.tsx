@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, DialogProps } from '@mui/material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 interface ContainerDialogProps extends Omit<DialogProps, 'sx'> {
     children: React.ReactNode;
@@ -11,7 +11,7 @@ export const ContainerDialog: React.FC<ContainerDialogProps> = ({
     PaperProps,
     ...dialogProps
 }) => {
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     return (
         <Dialog
@@ -30,3 +30,4 @@ export const ContainerDialog: React.FC<ContainerDialogProps> = ({
         </Dialog>
     );
 };
+

@@ -21,12 +21,11 @@ import { Link } from 'react-router-dom';
 import LogoLight from '@/assets/icons/logo-light.svg?react';
 import LogoDark from '@/assets/icons/logo-dark.svg?react';
 import { useUserStore } from '@/store/userStore';
-import { useDarkMode } from '@/contexts/DarkModeContext';
 
 export const SignUp = () => {
     const navigate = useNavigate();
     const { setUser } = useUserStore();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -51,7 +50,7 @@ export const SignUp = () => {
                 showError('Google sign-in failed. Please try again.');
             }
         } catch (error) {
-            toast.error('Google sign-in failed. Please try again.');
+            showError('Google sign-in failed. Please try again.');
         }
     };
 
@@ -219,22 +218,22 @@ export const SignUp = () => {
                     </Divider>
                     <Box className="flex w-full justify-center gap-3">
                         <Button variant="outlined" className="h-12 w-12 font-jakarta min-w-12">
-                            <AppleIcon className="text-primary text-xl" />
+                            <AppleIcon className="text-blue-500 text-xl" />
                         </Button>
                         <Button 
                             variant="outlined" 
                             className="h-12 w-12 font-jakarta min-w-12"
                             onClick={handleGoogleSignIn}
                         >
-                            <GoogleIcon className="text-primary text-xl" />
+                            <GoogleIcon className="text-blue-500 text-xl" />
                         </Button>
                         <Button variant="outlined" className="h-12 w-12 font-jakarta min-w-12">
-                            <FacebookOutlined className="text-primary text-xl" />
+                            <FacebookOutlined className="text-blue-500 text-xl" />
                         </Button>
                     </Box>
                     <Box className="w-full text-center mt-2">
                         <Typography variant="body2" className={`font-jakarta ${isDarkMode ? 'text-neutral-300' : 'text-neutral-500'}`}>
-                            Already have an account? <Link to="/auth/sign-in" className="text-primary font-medium">Sign In</Link>
+                            Already have an account? <Link to="/auth/sign-in" className="text-blue-500 font-medium">Sign In</Link>
                         </Typography>
                     </Box>
                 </Box>

@@ -1,38 +1,38 @@
 import React, { useState } from 'react';
-import { Avatar, Typography, Stack, IconButton, Chip, TextField, InputAdornment, useTheme } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { Container, Avatar, Typography, Stack, IconButton, Chip, TextField, InputAdornment, Box, Button } from '@mui/material';
 import { LocationOn, Search, Tune } from '@mui/icons-material';
 
-import { Container } from '@mui/material';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import EventCard from '@/components/cards/EventCard';
-import { useGeoStore } from '@/store/geoStore';
-import { useUser, useBookings, useUpdateBooking } from '@/hooks/entityConfigs';
-import { useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import { FilterModal } from '@/components/layout/FilterModal';
+import { getCategoryIcon } from '@/components/icons/CategoryIcon';
+
+import { useUser, useBookings, useUpdateBooking } from '@/hooks/useData';
+import { useUnifiedItems } from '@/hooks/useUnifiedItems';
+import { usePagination } from '@/hooks/usePagination';
+
 import { useUserStore } from '@/store/userStore';
 import { useFiltersStore } from '@/store/filtersStore';
 import { useDataStore } from '@/store/dataStore';
-import { getCategoryIcon } from '@/components/icons/CategoryIcon';
 
+import { showSuccess, showError } from '@/utils/notifications';
 import { detectUserLocation } from '@/utils/geo';
-import { useUnifiedItems } from '@/hooks/useUnifiedItems';
-import type { UnifiedItem } from '@/utils/schemas';
-import { FilterModal } from '@/components/layout/FilterModal';
 import { getAvatarProps } from '@/utils/avatarUtils';
-import { Link } from 'react-router-dom';
+import type { UnifiedItem } from '@/utils/schemas';
+
 import CancelEventDialog from '@/components/dialogs/CancelEventDialog';
+
 import { useCancelEvent } from '@/hooks/useCancelEvent';
-import { useNavigate } from 'react-router-dom';
-import { usePagination } from '@/hooks/usePagination';
-import { Box, Button } from '@mui/material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
-import { hasActiveFilters, resetAllFilters } from '@/utils/filterUtils';
-import { useQuery } from '@tanstack/react-query';
+
+import { hasActiveFilters, getFilteredItems } from '@/utils/filterUtils';
 import { getSeatAvailability } from '@/services/dataService';
 
 function Home() {
     const navigate = useNavigate();
-    const { city, country } = useGeoStore();
+    const { city, country } = useUserStore();
     const { user: authUser } = useUserStore();
     const { data: user } = useUser(authUser?.id || '');
     const { data: userBookings = [] } = useBookings();
@@ -61,18 +61,18 @@ function Home() {
         searchQuery, 
         setSearchQuery, 
         categories, 
-        getFilteredItems,
         minPrice,
         maxPrice,
         eventType,
         dateFilter,
-        locationFilter
+        locationFilter,
+        priceRange,
+        resetFilters
     } = useFiltersStore();
     const dataStore = useDataStore();
     const [detecting, setDetecting] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
-    const { isDarkMode } = useDarkMode();
-    const theme = useTheme();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [isFilterOpen, setFilterOpen] = useState(false);
     const { getVisibleItems, loadMore, hasMore, getRemainingCount } = usePagination();
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -85,7 +85,16 @@ function Home() {
         refetch: refetchItems
     } = useUnifiedItems();
 
-        const filteredItems = getFilteredItems(items);
+        const filteredItems = getFilteredItems(items, {
+            categoryFilter,
+            searchQuery,
+            locationFilter,
+            priceRange,
+            minPrice,
+            maxPrice,
+            eventType,
+            dateFilter
+        });
     
     const featuredItems = filteredItems.filter((item: UnifiedItem) => item.featured);
 
@@ -103,7 +112,7 @@ function Home() {
     if (itemsLoading) {
         return (
             <Container className="relative min-h-screen flex items-center justify-center">
-                <Typography variant="h6" className="text-center text-muted">
+                <Typography variant="h6" className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     Loading events and meetups...
                 </Typography>
             </Container>
@@ -188,7 +197,7 @@ function Home() {
             }
 
             updateBookingStatus(
-                { id: userBooking.id!, data: { status: 'cancelled' } },
+                { id: userBooking.id!, status: 'cancelled' },
                 {
                     onSuccess: () => {
                         queryClient.invalidateQueries({ queryKey: ['userBookings'] });
@@ -201,11 +210,11 @@ function Home() {
                             queryClient.invalidateQueries({ queryKey: ['seatAvailability', item.id] });
                         }
                         
-                        toast.success(`Successfully left ${item.type === 'meetup' ? 'meetup' : 'event'}!`);
+                        showSuccess(`Successfully left ${item.type === 'meetup' ? 'meetup' : 'event'}!`);
                     },
                     onError: (error: any) => {
                         console.error('Error leaving event/meetup:', error);
-                        toast.error(error.message || 'Failed to leave event/meetup');
+                        showError(error.message || 'Failed to leave event/meetup');
                     }
                 }
             );
@@ -251,25 +260,28 @@ function Home() {
 
     return (
         <>
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
+            </Box>
             <Container className='relative min-h-screen'>
-                <Box className='no-scrollbar w-full overflow-y-auto '>
+                <Box className='no-scrollbar w-full overflow-y-auto'>
                 <Box className='mb-8 flex w-full items-center justify-between'>
                     <IconButton
                         size='large'
-                        className="text-text-3 border border-neutral-200 bg-primary text-white"
+                        className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} border border-neutral-200 bg-primary text-white`}
                         onClick={handleDetectLocation}
                     >
                         <LocationOn className="text-2xl" />
                     </IconButton>
-                    <Typography variant='body1' className="font-jakarta text-muted-dark">
+                    <Typography variant='body1' className={`font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         {detecting ? 'Detecting...' : city && country ? `${city}, ${country}` : 'Tap to detect'}
                     </Typography>
                     <Avatar {...getAvatarProps(user, authUser, 48)} />
                 </Box>
-                <Typography variant='h1' className="mb-2 self-start font-jakarta font-semibold text-primary">
+                <Typography variant='h1' className="mb-2 self-start font-jakarta font-semibold text-blue-500 dark:text-blue-400">
                     Hello, {(user?.full_name || authUser?.full_name)?.split(' ')[0] ?? 'Guest'}!
                 </Typography>
-                <Typography variant='body2' className="mb-4 self-start font-jakarta text-muted-dark">
+                <Typography variant='body2' className={`mb-4 self-start font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     Welcome back, hope you&#39;re feeling good today!
                 </Typography>
                 <Box className='mb-6 flex w-full items-center gap-2'>
@@ -282,7 +294,7 @@ function Home() {
                             input: {
                                 startAdornment: (
                                     <InputAdornment position='start'>
-                                        <Search className="text-muted-dark" />
+                                        <Search className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                                     </InputAdornment>
                                 ),
                             },
@@ -290,22 +302,31 @@ function Home() {
                     />
                     <IconButton
                         size='large'
-                        className="bg-primary text-white flex-shrink-0"
+                        className="bg-blue-500 hover:bg-blue-600 text-white flex-shrink-0"
                         onClick={() => setFilterOpen(true)}
                     >
                         <Tune />
                     </IconButton>
                 </Box>
 
-                {hasActiveFilters() && (
+                {hasActiveFilters({
+                    categoryFilter,
+                    searchQuery,
+                    locationFilter,
+                    priceRange,
+                    minPrice,
+                    maxPrice,
+                    eventType,
+                    dateFilter
+                }) && (
                     <Box className="mb-4 p-3 rounded-lg bg-surface-dark">
                         <Box className='flex items-center justify-between mb-2'>
-                            <Typography variant='body2' className="font-jakarta text-muted-dark">
+                            <Typography variant='body2' className={`font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Active filters:
                             </Typography>
                             <Button
                                 size='small'
-                                onClick={resetAllFilters}
+                                onClick={resetFilters}
                                 className='border border-gray-300 text-xs px-2 py-1 min-w-0'
                             >
                                 Clear all
@@ -317,7 +338,7 @@ function Home() {
                                     label={`Search: "${searchQuery}"`}
                                     onDelete={() => setSearchQuery('')}
                                     size='small'
-                                    className="bg-chip-dark text-chip-dark border-chip-dark"
+                                    className="bg-gray-800 text-gray-200 border-gray-800"
                                 />
                             )}
                             {categoryFilter !== 'All' && (
@@ -325,35 +346,35 @@ function Home() {
                                     label={`Category: ${categoryFilter}`}
                                     onDelete={() => setCategoryFilter('All')}
                                     size='small'
-                                    className="bg-chip-dark text-chip-dark border-chip-dark"
+                                    className="bg-gray-800 text-gray-200 border-gray-800"
                                 />
                             )}
                             {eventType !== 'Any' && (
                                 <Chip
                                     label={`Type: ${eventType}`}
                                     size='small'
-                                    className="bg-chip-dark text-chip-dark border-chip-dark"
+                                    className="bg-gray-800 text-gray-200 border-gray-800"
                                 />
                             )}
                             {dateFilter !== 'Upcoming' && (
                                 <Chip
                                     label={`Date: ${dateFilter}`}
                                     size='small'
-                                    className="bg-chip-dark text-chip-dark border-chip-dark"
+                                    className="bg-gray-800 text-gray-200 border-gray-800"
                                 />
                             )}
                             {locationFilter && (
                                 <Chip
                                     label={`Location: ${locationFilter}`}
                                     size='small'
-                                    className="bg-chip-dark text-chip-dark border-chip-dark"
+                                    className="bg-gray-800 text-gray-200 border-gray-800"
                                 />
                             )}
                             {(minPrice > 0 || maxPrice < 500) && (
                                 <Chip
                                     label={`Price: $${minPrice} - $${maxPrice}`}
                                     size='small'
-                                    className="bg-chip-dark text-chip-dark border-chip-dark"
+                                    className="bg-gray-800 text-gray-200 border-gray-800"
                                 />
                             )}
                         </Stack>
@@ -379,7 +400,7 @@ function Home() {
                 </Stack>
                 {filteredItems.length > 0 && (
                     <>
-                        <Typography variant='h4' className="font-jakarta font-semibold text-primary">Featured Events</Typography>
+                        <Typography variant='h4' className="font-jakarta font-semibold text-blue-500 dark:text-blue-400">Featured Events</Typography>
                         <Box className='flex justify-center py-4'>
                             {featuredItems.length > 0 &&
                                 featuredItems[activeStep] &&
@@ -401,15 +422,24 @@ function Home() {
                     ))}
                 </Box>
                 <Box className='flex justify-between'>
-                    <Typography variant='h4' className="font-jakarta font-semibold text-primary">Upcoming Events</Typography>
-                    <Link to={'/upcoming'} className="text-link-dark">See All</Link>
+                    <Typography variant='h4' className="font-jakarta font-semibold text-blue-500 dark:text-blue-400">Upcoming Events</Typography>
+                    <Link to={'/upcoming'} className="font-jakarta text-sm font-medium text-blue-500 dark:text-blue-400">See All</Link>
                 </Box>
                 <Stack direction='column' spacing={2} className='py-4 pb-24'>
                     {filteredItems.length > 0 ? (
                         getVisibleItems(filteredItems).map((item: UnifiedItem) => renderEventCard(item, 'horizontal-compact'))
                     ) : (
-                        <Typography variant='body2' className="py-4 text-center font-jakarta text-muted-dark">
-                            {hasActiveFilters()
+                        <Typography variant='body2' className={`py-4 text-center font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {hasActiveFilters({
+                                categoryFilter,
+                                searchQuery,
+                                locationFilter,
+                                priceRange,
+                                minPrice,
+                                maxPrice,
+                                eventType,
+                                dateFilter
+                            })
                                 ? 'No items match your current filters. Try adjusting your search criteria.'
                                 : 'No upcoming events found.'
                             }

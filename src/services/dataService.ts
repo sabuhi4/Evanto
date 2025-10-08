@@ -14,128 +14,65 @@ import {
 } from '@/utils/schemas';
 
 
-// Simple CRUD functions for events
-export const createEvent = async (data: Omit<Event, 'id' | 'created_at' | 'updated_at'>): Promise<Event> => {
-  const validatedData = eventSchema.omit({ id: true, created_at: true, updated_at: true }).parse(data);
+
+const createItem = async <T>(table: string, schema: any, data: any): Promise<T> => {
+  const validatedData = schema.omit({ id: true, created_at: true, updated_at: true }).parse(data);
   const { data: result, error } = await supabase
-    .from('events')
+    .from(table)
     .insert(validatedData)
     .select()
     .single();
-  
   if (error) throw error;
   return result;
 };
 
+const updateItem = async <T>(table: string, id: string, data: any): Promise<T> => {
+  const { data: result, error } = await supabase
+    .from(table)
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return result;
+};
+
+const deleteItem = async (table: string, id: string): Promise<void> => {
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) throw error;
+};
+
+export const createEvent = (data: Omit<Event, 'id' | 'created_at' | 'updated_at'>) => createItem<Event>('events', eventSchema, data);
 export const getEvents = async (): Promise<Event[]> => {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .neq('status', 'cancelled');
+  const { data, error } = await supabase.from('events').select('*').neq('status', 'cancelled');
   if (error) throw error;
   return data || [];
 };
+export const updateEvent = (id: string, data: Partial<Event>) => updateItem<Event>('events', id, data);
+export const deleteEvent = (id: string) => deleteItem('events', id);
 
-
-export const updateEvent = async (id: string, data: Partial<Event>): Promise<Event> => {
-  const { data: result, error } = await supabase
-    .from('events')
-    .update(data)
-    .eq('id', id)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
-};
-
-export const deleteEvent = async (id: string): Promise<void> => {
-  const { error } = await supabase.from('events').delete().eq('id', id);
-  if (error) throw error;
-};
-
-// Simple CRUD functions for meetups
-export const createMeetup = async (data: Omit<Meetup, 'id' | 'created_at' | 'updated_at'>): Promise<Meetup> => {
-  const validatedData = meetupSchema.omit({ id: true, created_at: true, updated_at: true }).parse(data);
-  const { data: result, error } = await supabase
-    .from('meetups')
-    .insert(validatedData)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
-};
-
+export const createMeetup = (data: Omit<Meetup, 'id' | 'created_at' | 'updated_at'>) => createItem<Meetup>('meetups', meetupSchema, data);
 export const getMeetups = async (): Promise<Meetup[]> => {
-  const { data, error } = await supabase
-    .from('meetups')
-    .select('*')
-    .neq('status', 'cancelled');
+  const { data, error } = await supabase.from('meetups').select('*').neq('status', 'cancelled');
   if (error) throw error;
   return data || [];
 };
+export const updateMeetup = (id: string, data: Partial<Meetup>) => updateItem<Meetup>('meetups', id, data);
+export const deleteMeetup = (id: string) => deleteItem('meetups', id);
 
-
-export const updateMeetup = async (id: string, data: Partial<Meetup>): Promise<Meetup> => {
-  const { data: result, error } = await supabase
-    .from('meetups')
-    .update(data)
-    .eq('id', id)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
-};
-
-export const deleteMeetup = async (id: string): Promise<void> => {
-  const { error } = await supabase.from('meetups').delete().eq('id', id);
-  if (error) throw error;
-};
-
-// Simple CRUD functions for users
-export const createUser = async (data: Omit<User, 'id' | 'created_at' | 'updated_at'>): Promise<User> => {
-  const validatedData = userSchema.omit({ id: true, created_at: true, updated_at: true }).parse(data);
-  const { data: result, error } = await supabase
-    .from('users')
-    .insert(validatedData)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
-};
-
+export const createUser = (data: Omit<User, 'id' | 'created_at' | 'updated_at'>) => createItem<User>('users', userSchema, data);
 export const getUsers = async (): Promise<User[]> => {
   const { data, error } = await supabase.from('users').select('*');
   if (error) throw error;
   return data || [];
 };
-
-export const updateUser = async (id: string, data: Partial<User>): Promise<User> => {
-  const { data: result, error } = await supabase
-    .from('users')
-    .update(data)
-    .eq('id', id)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
-};
-
-export const deleteUser = async (id: string): Promise<void> => {
-  const { error } = await supabase.from('users').delete().eq('id', id);
-  if (error) throw error;
-};
+export const updateUser = (id: string, data: Partial<User>) => updateItem<User>('users', id, data);
+export const deleteUser = (id: string) => deleteItem('users', id);
 
 
-// Simple CRUD functions for bookings
 export const createBooking = async (data: Omit<Booking, 'id' | 'created_at' | 'updated_at' | 'confirmed_at'>): Promise<Booking> => {
   const validatedData = bookingSchema.omit({ id: true, created_at: true, updated_at: true, confirmed_at: true }).parse(data);
   
-  // Check seat availability before creating booking
   if (data.event_id) {
     const availability = await getSeatAvailability(data.event_id);
     const requestedSeats = data.selected_seats?.length || 0;
@@ -149,14 +86,7 @@ export const createBooking = async (data: Omit<Booking, 'id' | 'created_at' | 'u
     }
   }
   
-  const { data: result, error } = await supabase
-    .from('bookings')
-    .insert(validatedData)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
+  return createItem<Booking>('bookings', bookingSchema, validatedData);
 };
 
 export const getUserBookings = async (): Promise<Booking[]> => {
@@ -178,7 +108,7 @@ export const getEventBookings = async (eventId: string): Promise<Booking[]> => {
     .from('bookings')
     .select('*')
     .eq('event_id', eventId)
-    .in('status', ['pending', 'confirmed']); // Only count active bookings
+    .in('status', ['pending', 'confirmed']);
 
   if (error) throw error;
   return data || [];
@@ -192,7 +122,6 @@ export const getSeatAvailability = async (eventId: string, maxParticipants?: num
 }> => {
   const bookings = await getEventBookings(eventId);
   
-  // Get all booked seats from confirmed/pending bookings
   const bookedSeats: string[] = [];
   bookings.forEach(booking => {
     if (booking.selected_seats && Array.isArray(booking.selected_seats)) {
@@ -204,8 +133,7 @@ export const getSeatAvailability = async (eventId: string, maxParticipants?: num
     }
   });
 
-  // Calculate total available seats
-  const totalSeats = maxParticipants || 63; // Default to 7x9 grid (63 seats)
+  const totalSeats = maxParticipants || 63;
   const availableSeats = totalSeats - bookedSeats.length;
   const isFullyBooked = availableSeats <= 0;
 
@@ -224,23 +152,13 @@ export const updateBookingStatus = async (bookingId: string, status: Booking['st
     ...(status === 'confirmed' && { confirmed_at: new Date().toISOString() })
   };
 
-  // If cancelling, clear selected_seats to make them available again
   if (status === 'cancelled') {
     updateData.selected_seats = [];
   }
 
-  const { data: result, error } = await supabase
-    .from('bookings')
-    .update(updateData)
-    .eq('id', bookingId)
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return result;
+  return updateItem<Booking>('bookings', bookingId, updateData);
 };
 
-// Payment card functions
 export const fetchPaymentCards = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
@@ -270,7 +188,6 @@ export const createPaymentCard = async (cardData: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  // If this is the first card, set it as default
   const existingCards = await fetchPaymentCards();
   const shouldSetDefault = existingCards.length === 0;
 
@@ -284,14 +201,7 @@ export const createPaymentCard = async (cardData: {
     is_default: shouldSetDefault,
   };
 
-  const { data, error } = await supabase
-    .from('payment_methods')
-    .insert(insertData)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return createItem('payment_methods', null, insertData);
 };
 
 export const updatePaymentCard = async (id: string, cardData: Partial<{
@@ -307,30 +217,17 @@ export const updatePaymentCard = async (id: string, cardData: Partial<{
   if (cardData.expiry_year !== undefined) updateData.expiry_year = cardData.expiry_year;
   if (cardData.is_default !== undefined) updateData.is_default = cardData.is_default;
 
-  const { data, error } = await supabase
-    .from('payment_methods')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return updateItem('payment_methods', id, updateData);
 };
 
-export const deletePaymentCard = async (id: string) => {
-  const { error } = await supabase.from('payment_methods').delete().eq('id', id);
-  if (error) throw error;
-};
+export const deletePaymentCard = (id: string) => deleteItem('payment_methods', id);
 
 export const setDefaultPaymentCard = async (id: string) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  // Unset any existing default for this user
   await supabase.from('payment_methods').update({ is_default: false }).eq('user_id', user.id);
 
-  // Set new default for this user
   const { error } = await supabase
     .from('payment_methods')
     .update({ is_default: true })
@@ -340,7 +237,6 @@ export const setDefaultPaymentCard = async (id: string) => {
   if (error) throw error;
 };
 
-// Favorites functions
 export const fetchFavorites = async (userId: string) => {
   const { data, error } = await supabase.from('favorites').select('item_id,user_id,item_type').eq('user_id', userId);
   if (error) throw error;
@@ -348,7 +244,6 @@ export const fetchFavorites = async (userId: string) => {
 };
 
 export const addFavorite = async (itemId: string, userId: string, itemType: 'event' | 'meetup') => {
-  // First check if the favorite already exists
   const { data: existing, error: checkError } = await supabase
     .from('favorites')
     .select('*')
@@ -359,18 +254,14 @@ export const addFavorite = async (itemId: string, userId: string, itemType: 'eve
   if (checkError) throw checkError;
 
   if (existing) {
-    // Favorite already exists, return success
     return true;
   }
-
-  // Validate data with schema
   const validatedData = favoriteSchema.omit({ id: true, created_at: true }).parse({
     user_id: userId,
     item_id: itemId,
     item_type: itemType
   });
 
-  // Add the favorite if it doesn't exist
   const { error } = await supabase
     .from('favorites')
     .insert(validatedData);
@@ -384,7 +275,6 @@ export const deleteFavorite = async (itemId: string, userId: string) => {
   return true;
 };
 
-// User profile functions
 export const fetchUserProfile = async (userId?: string) => {
   let authUser;
   if (userId) {
@@ -397,7 +287,6 @@ export const fetchUserProfile = async (userId?: string) => {
   
   if (!authUser) return null;
 
-  // First try to fetch existing user
   const { data: existingUser, error: fetchError } = await supabase
     .from('users')
     .select('*')
@@ -406,7 +295,6 @@ export const fetchUserProfile = async (userId?: string) => {
 
   if (fetchError) throw fetchError;
 
-  // If user doesn't exist, create them
   if (!existingUser) {
     const { data: newUser, error: createError } = await supabase
       .from('users')
@@ -421,7 +309,6 @@ export const fetchUserProfile = async (userId?: string) => {
       .single();
 
     if (createError) {
-      // If it's a duplicate email error, try to fetch the existing user by email
       if (createError.code === '23505' && createError.message.includes('email')) {
         const { data: existingUserByEmail } = await supabase
           .from('users')
@@ -451,18 +338,10 @@ export const updateUserProfile = async (profileData: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { data, error } = await supabase
-    .from('users')
-    .update({
-      ...profileData,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', user.id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return updateItem('users', user.id, {
+    ...profileData,
+    updated_at: new Date().toISOString()
+  });
 };
 
 export const fetchUserStats = async (userId?: string) => {
@@ -475,7 +354,6 @@ export const fetchUserStats = async (userId?: string) => {
     user = authUser;
   }
 
-  // Get events count (events user created)
   const { data: events, error: eventsError } = await supabase
     .from('events')
     .select('id')
@@ -483,7 +361,6 @@ export const fetchUserStats = async (userId?: string) => {
 
   if (eventsError) throw eventsError;
 
-  // Get meetups count (meetups user created)
   const { data: meetups, error: meetupsError } = await supabase
     .from('meetups')
     .select('id')
@@ -491,12 +368,11 @@ export const fetchUserStats = async (userId?: string) => {
 
   if (meetupsError) throw meetupsError;
 
-  // Get bookings count (events user is attending - only active bookings)
   const { data: bookings, error: bookingsError } = await supabase
     .from('bookings')
     .select('id')
     .eq('user_id', user.id)
-    .in('status', ['pending', 'confirmed']); // Only count active bookings
+    .in('status', ['pending', 'confirmed']);
 
   if (bookingsError) throw bookingsError;
 
@@ -510,26 +386,20 @@ export const fetchUserStats = async (userId?: string) => {
   };
 };
 
-// ===== UNIFIED SERVICE FUNCTIONS =====
-// These replace the separate events/meetups fetching with a single unified approach
 
 export const getAllItems = async (): Promise<UnifiedItem[]> => {
-  // Get current user to include their cancelled events
-  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  let currentUser = null;
   
-  // Build queries for events and meetups
-  let eventsQuery = supabase.from('events').select('*');
-  let meetupsQuery = supabase.from('meetups').select('*');
-  
-  // If user is logged in, include their cancelled events/meetups
-  if (currentUser) {
-    eventsQuery = eventsQuery.or(`status.neq.cancelled,user_id.eq.${currentUser.id}`);
-    meetupsQuery = meetupsQuery.or(`status.neq.cancelled,user_id.eq.${currentUser.id}`);
-  } else {
-    // For guests, only show non-cancelled events
-    eventsQuery = eventsQuery.neq('status', 'cancelled');
-    meetupsQuery = meetupsQuery.neq('status', 'cancelled');
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    currentUser = user;
+  } catch (error) {
+    // JWT expired or invalid - continue without user context
+    console.log('No valid user session, loading public data only');
   }
+  
+  const eventsQuery = supabase.from('events').select('*').neq('status', 'cancelled');
+  const meetupsQuery = supabase.from('meetups').select('*').neq('status', 'cancelled');
   
   const [eventsResult, meetupsResult] = await Promise.all([
     eventsQuery,
@@ -539,13 +409,11 @@ export const getAllItems = async (): Promise<UnifiedItem[]> => {
   if (eventsResult.error) throw eventsResult.error;
   if (meetupsResult.error) throw meetupsResult.error;
   
-  // Transform events to unified format
   const events: UnifiedItem[] = (eventsResult.data || []).map(event => ({
     ...event,
     type: 'event' as const,
   }));
   
-  // Transform meetups to unified format
   const meetups: UnifiedItem[] = (meetupsResult.data || []).map(meetup => ({
     ...meetup,
     type: 'meetup' as const,
@@ -567,7 +435,6 @@ export const getItemById = async (id: string, type: 'event' | 'meetup'): Promise
   if (error) throw error;
   if (!data) return null;
   
-  // Transform to unified format
   const unifiedItem: UnifiedItem = {
     ...data,
     type: type as 'event' | 'meetup',

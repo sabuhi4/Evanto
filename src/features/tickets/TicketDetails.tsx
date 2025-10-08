@@ -18,23 +18,23 @@ function TicketDetails() {
     if (!ticket) {
         return (
             <Container className='relative gap-4 overflow-hidden whitespace-nowrap'>
-                <Box className='header-nav-2-icons'>
+                <Box className='flex items-center justify-between w-full'>
                     <IconButton 
                         onClick={handleBack}
-                        className="text-muted border border-neutral-200 bg-gray-100 dark:bg-gray-700 rounded-full"
+                        className="text-gray-600 dark:text-gray-400 border border-neutral-200 bg-gray-100 dark:bg-gray-700 rounded-full"
                     >
                         <KeyboardArrowLeftOutlined />
                     </IconButton>
-                    <Typography variant='h4' className='text-primary'>Ticket Details</Typography>
-                    <IconButton className="text-muted border border-neutral-200 bg-gray-100 dark:bg-gray-700">
+                    <Typography variant='h4' className='text-blue-500 dark:text-blue-400'>Ticket Details</Typography>
+                    <IconButton className="">
                         <DeleteOutlineOutlined />
                     </IconButton>
                 </Box>
                 <Box className='text-center py-12'>
-                    <Typography variant='h6' className='text-muted mb-4'>
+                    <Typography variant='h6' className='text-gray-600 dark:text-gray-400 mb-4'>
                         No ticket selected
                     </Typography>
-                    <Typography className='text-sm text-muted'>
+                    <Typography className='text-sm text-gray-600 dark:text-gray-400'>
                         Please go back and select a ticket to view details
                     </Typography>
                 </Box>
@@ -45,15 +45,15 @@ function TicketDetails() {
     return (
         <Container className='relative min-h-screen'>
             {/* Header */}
-            <Box className='header-nav-2-icons'>
+            <Box className='flex items-center justify-between w-full'>
                 <IconButton 
                     onClick={handleBack}
-                    className="text-muted border border-neutral-200 bg-gray-100 dark:bg-gray-700 rounded-full"
+                    className="text-gray-600 dark:text-gray-400 border border-neutral-200 bg-gray-100 dark:bg-gray-700 rounded-full"
                 >
                     <KeyboardArrowLeftOutlined />
                 </IconButton>
                 <Typography variant='h4'>Ticket Details</Typography>
-                <IconButton className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700">
+                <IconButton className="">
                     <DeleteOutlineOutlined />
                 </IconButton>
             </Box>

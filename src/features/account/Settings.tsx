@@ -19,13 +19,14 @@ import {
 } from '@mui/icons-material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
 
 export const Settings = () => {
     const navigate = useNavigate();
-    const { isDarkMode, toggleDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
+    const toggleDarkMode = useUserStore(state => state.toggleDarkMode);
     
     // Navigation handlers
     const handleLanguage = () => navigate('/profile/language');
@@ -106,4 +107,5 @@ export const Settings = () => {
         </>
     );
 }
+
 

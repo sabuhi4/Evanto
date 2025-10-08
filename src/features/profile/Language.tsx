@@ -2,13 +2,13 @@ import { Container } from '@mui/material';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Radio, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
 
 function Language() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const [selectedLanguage, setSelectedLanguage] = useState('English (US)');
 
     const handleBack = () => {
@@ -105,3 +105,4 @@ function Language() {
 }
 
 export default Language;
+

@@ -76,7 +76,6 @@ export const meetupSchema = z.object({
 
 export type Meetup = z.infer<typeof meetupSchema>;
 
-// User schema for users table
 export const userSchema = z.object({
     id: z.string().uuid().optional().nullable(),
     email: z.string().email('Invalid email format'),
@@ -95,12 +94,11 @@ export const userSchema = z.object({
 
 export type User = z.infer<typeof userSchema>;
 
-// Payment method schema for payment_methods table
 export const paymentMethodSchema = z.object({
     id: z.string().uuid().optional().nullable(),
     user_id: z.string().uuid().optional(),
     type: z.enum(['card', 'paypal', 'apple_pay', 'google_pay']),
-    card_type: z.string().optional(), // 'visa', 'mastercard', etc.
+    card_type: z.string().optional(),
     last_four_digits: z.string().optional(),
     expiry_month: z.number().optional(),
     expiry_year: z.number().optional(),
@@ -111,7 +109,6 @@ export const paymentMethodSchema = z.object({
 export type PaymentMethod = z.infer<typeof paymentMethodSchema>;
 
 
-// Booking schema for bookings table
 export const bookingSchema = z.object({
     id: z.string().uuid().optional().nullable(),
     user_id: z.string().uuid().optional(),
@@ -135,7 +132,6 @@ export const bookingSchema = z.object({
 
 export type Booking = z.infer<typeof bookingSchema>;
 
-// Favorite schema for favorites table
 export const favoriteSchema = z.object({
   id: z.string().uuid().optional().nullable(),
   user_id: z.string().uuid(),
@@ -146,14 +142,8 @@ export const favoriteSchema = z.object({
 
 export type Favorite = z.infer<typeof favoriteSchema>;
 
-// =====================================================
-// UNIFIED TYPES
-// =====================================================
-
-// Unified item type that includes all possible properties
 export type UnifiedItem = Event | Meetup;
 
-// Authentication types
 export type AuthProvider = 'google' | 'apple' | 'facebook';
 
 export interface UserProfile {
@@ -164,7 +154,6 @@ export interface UserProfile {
   provider?: AuthProvider;
 }
 
-// Booking form schema for user input forms (not database table)
 export const bookingFormSchema = z.object({
     first_name: z.string().min(1, 'First name is required'),
     last_name: z.string().min(1, 'Last name is required'),

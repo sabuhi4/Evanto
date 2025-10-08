@@ -1,29 +1,19 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { ThemeProvider as MUIThemeProviderCore } from '@mui/material/styles';
 import createBaseTheme from '@/styles/muiTheme';
-import { useDarkMode } from './DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
-interface MUIThemeContextType {
-  // Add any theme-related utilities here if needed
-}
-
-const MUIThemeContext = createContext<MUIThemeContextType>({});
-
-export const useMUITheme = () => useContext(MUIThemeContext);
-
-interface CustomMUIThemeProviderProps {
+interface MUIThemeProviderProps {
   children: ReactNode;
 }
 
-export const MUIThemeProvider: React.FC<CustomMUIThemeProviderProps> = ({ children }) => {
-  const { isDarkMode } = useDarkMode();
+export const MUIThemeProvider: React.FC<MUIThemeProviderProps> = ({ children }) => {
+  const isDarkMode = useUserStore(state => state.isDarkMode);
   const theme = createBaseTheme(isDarkMode);
 
   return (
-    <MUIThemeContext.Provider value={{}}>
-      <MUIThemeProviderCore theme={theme}>
-        {children}
-      </MUIThemeProviderCore>
-    </MUIThemeContext.Provider>
+    <MUIThemeProviderCore theme={theme}>
+      {children}
+    </MUIThemeProviderCore>
   );
 };

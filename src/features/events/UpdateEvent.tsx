@@ -9,10 +9,10 @@ import {
 import { Container } from '@mui/material';
 import { useUserStore } from '@/store/userStore';
 import { useFiltersStore } from '@/store/filtersStore';
-import { useDarkMode } from '@/contexts/DarkModeContext';
-import { useUpdateEvent, useUpdateMeetup } from '@/hooks/entityConfigs';
+import { useUpdateEvent, useUpdateMeetup } from '@/hooks/useData';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { supabase } from '@/utils/supabase';
-import toast from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { format } from 'date-fns';
 import type { UnifiedItem } from '@/utils/schemas';
 import { LocationPicker } from '@/components/forms/LocationPicker';
@@ -21,7 +21,7 @@ function UpdateEvent() {
     const navigate = useNavigate();
     const location = useLocation();
     const user = useUserStore(state => state.user);
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     
     const item = location.state?.item as UnifiedItem;
     const itemType = location.state?.itemType as 'event' | 'meetup';
@@ -72,7 +72,7 @@ function UpdateEvent() {
             setLoading(true);
             
             if (!item?.id || !user?.id) {
-                toast.error('No item ID or user ID found');
+                showError('No item ID or user ID found');
                 return;
             }
 
@@ -92,7 +92,7 @@ function UpdateEvent() {
 
                     if (uploadError) {
                         console.error('Upload failed:', uploadError);
-                        toast.error('Failed to upload image');
+                        showError('Failed to upload image');
                         image_url = null;
                     } else {
                         const { data: { publicUrl } } = supabase.storage
@@ -126,12 +126,12 @@ function UpdateEvent() {
                     { id: item.id, data: updateData },
                     {
                         onSuccess: () => {
-                            toast.success('Event updated successfully!');
+                            showSuccess('Event updated successfully!');
                             navigate('/events/manage');
                         },
                         onError: (error) => {
                             console.error('Update error:', error);
-                            toast.error('Failed to update event');
+                            showError('Failed to update event');
                         },
                     }
                 );
@@ -140,19 +140,19 @@ function UpdateEvent() {
                     { id: item.id, data: updateData },
                     {
                         onSuccess: () => {
-                            toast.success('Meetup updated successfully!');
+                            showSuccess('Meetup updated successfully!');
                             navigate('/events/manage');
                         },
                         onError: (error) => {
                             console.error('Update error:', error);
-                            toast.error('Failed to update meetup');
+                            showError('Failed to update meetup');
                         },
                     }
                 );
             }
         } catch (error) {
             console.error('Update error:', error);
-            toast.error('Failed to update item');
+            showError('Failed to update item');
         } finally {
             setLoading(false);
         }
@@ -161,7 +161,7 @@ function UpdateEvent() {
     if (!user) {
         return (
             <Container className="justify-center">
-                <Typography variant="h6" className="text-center text-text-3">
+                <Typography variant="h6" className={`text-center ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
                     Please sign in to edit events
                 </Typography>
             </Container>
@@ -171,13 +171,13 @@ function UpdateEvent() {
     if (!item || !itemType) {
         return (
             <Container className="justify-center">
-                <Typography variant="h6" className="text-center text-text-3">
+                <Typography variant="h6" className={`text-center ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
                     No item data found
                 </Typography>
                 <Button 
                     onClick={() => navigate('/events/manage')}
                     variant="contained"
-                    className="mt-4 bg-primary-1 text-white"
+                    className="mt-4 bg-blue-500 text-white"
                     sx={{ textTransform: 'none' }}
                 >
                     Go Back
@@ -188,17 +188,19 @@ function UpdateEvent() {
 
     return (
         <>
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
+            </Box>
             <Container className="relative min-h-screen">
                 <Box className="no-scrollbar w-full overflow-y-auto">
                     {/* Header */}
                     <Box className="mb-8 flex w-full items-center justify-between">
                         <IconButton 
                             onClick={() => navigate('/events/manage')} 
-                            className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700"
                         >
                             <KeyboardArrowLeft />
                         </IconButton>
-                        <Typography variant="h4" className="font-poppins font-semibold text-gray-900 dark:text-white">
+                        <Typography variant="h4" className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             Edit {itemType === 'event' ? 'Event' : 'Meetup'}
                         </Typography>
                         <Box className="w-10" />
@@ -212,14 +214,7 @@ function UpdateEvent() {
                             onClick={handleSave}
                             disabled={loading}
                             size="large"
-                            className="w-full h-12 font-jakarta"
-                            sx={{
-                                backgroundColor: '#5D9BFC',
-                                color: 'white',
-                                '&:hover': {
-                                    backgroundColor: '#4A8BFC',
-                                },
-                            }}
+                            className="w-full h-12 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-0.5"
                         >
                             {loading ? 'Saving...' : 'Save Changes'}
                         </Button>
@@ -353,7 +348,6 @@ function UpdateEvent() {
                                             setEditForm(prev => ({ ...prev, start_date: date }));
                                         }
                                     }}
-                                    className="text-input"
                                     fullWidth
                                 />
                                 
@@ -367,7 +361,6 @@ function UpdateEvent() {
                                             setEditForm(prev => ({ ...prev, end_date: date }));
                                         }
                                     }}
-                                    className="text-input"
                                     fullWidth
                                 />
                             </Box>
@@ -380,7 +373,6 @@ function UpdateEvent() {
                                     ...prev, 
                                     ticket_price: Number(e.target.value) 
                                 }))}
-                                className="text-input"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <span className="mr-2">$</span>,
@@ -388,7 +380,7 @@ function UpdateEvent() {
                             />
 
                             <Box>
-                                <Typography variant="body2" className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                                <Typography variant="body2" className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-neutral-600'}`}>
                                     Event Image
                                 </Typography>
                                 <input
@@ -400,10 +392,10 @@ function UpdateEvent() {
                                             setEditForm(prev => ({ ...prev, event_image: file }));
                                         }
                                     }}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full"
                                 />
                                 {editForm.event_image && (
-                                    <Typography variant="caption" className={`${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                                    <Typography variant="caption" className={`${isDarkMode ? 'text-gray-300' : 'text-neutral-600'}`}>
                                         Image selected: {editForm.event_image.name}
                                     </Typography>
                                 )}
@@ -424,13 +416,13 @@ function UpdateEvent() {
                                 label="Meetup Link"
                                 value={editForm.meetup_link}
                                 onChange={(e) => setEditForm(prev => ({ ...prev, meetup_link: e.target.value }))}
-                                className="text-input"
+                                className="w-full"
                                 fullWidth
                                 placeholder="https://meet.google.com/..."
                             />
 
                             <Box>
-                                <Typography variant="body2" className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                                <Typography variant="body2" className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-neutral-600'}`}>
                                     Meetup Image
                                 </Typography>
                                 <input
@@ -442,10 +434,10 @@ function UpdateEvent() {
                                             setEditForm(prev => ({ ...prev, image_url: file }));
                                         }
                                     }}
-                                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                    className="w-full"
                                 />
                                 {editForm.image_url && (
-                                    <Typography variant="caption" className={`${isDarkMode ? 'text-gray-300' : 'text-text-3'}`}>
+                                    <Typography variant="caption" className={`${isDarkMode ? 'text-gray-300' : 'text-neutral-600'}`}>
                                         Image selected: {editForm.image_url.name}
                                     </Typography>
                                 )}
@@ -460,3 +452,4 @@ function UpdateEvent() {
 }
 
 export default UpdateEvent;
+

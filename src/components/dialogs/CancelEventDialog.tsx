@@ -8,7 +8,7 @@ import {
     Box,
 } from '@mui/material';
 import { Warning } from '@mui/icons-material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { ContainerDialog } from './ContainerDialog';
 
 interface CancelEventDialogProps {
@@ -28,7 +28,7 @@ const CancelEventDialog: React.FC<CancelEventDialogProps> = ({
     eventType,
     loading = false,
 }) => {
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     return (
         <ContainerDialog
@@ -99,3 +99,4 @@ const CancelEventDialog: React.FC<CancelEventDialogProps> = ({
 };
 
 export default CancelEventDialog;
+

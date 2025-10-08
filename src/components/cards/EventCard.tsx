@@ -17,7 +17,7 @@ import { CalendarToday, LocationOn, Favorite } from '@mui/icons-material';
 import { formatSmartDate, formatPrice } from '@/utils/format';
 import type { UnifiedItem } from '@/utils/schemas';
 import { useFavorite } from '@/hooks/useFavorite';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { showSuccess } from '@/utils/notifications';
 
 type EventCardVariant = 'vertical' | 'horizontal' | 'vertical-compact' | 'horizontal-compact';
@@ -41,7 +41,7 @@ export const EventCard = ({
     className = '',
 }: EventCardProps) => {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const { isFavorite, toggle, isLoading, isEnabled } = useFavorite(item.id?.toString(), item.type);
 
     const handleCardClick = () => {
@@ -76,41 +76,40 @@ export const EventCard = ({
                                 className='h-full w-full rounded-xl'
                             />
                             {category && (
-                                <Chip label={category} size='small' className='chip-event chip-event-absolute' />
+                                <Chip 
+                                    label={category} 
+                                    size='small' 
+                                    className='absolute top-2 left-2 z-10 text-xs font-medium h-6 rounded-full bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800' 
+                                />
                             )}
                         </Box>
                         <CardContent className='flex flex-1 flex-col gap-3 p-0'>
                             <Typography
                                 variant='h6'
-                                className={`text-event-title mb-2 line-clamp-2 leading-tight ${isDarkMode ? 'text-event-title-dark' : 'text-event-title-light'}`}
+                                className={`text-base font-semibold mb-2 line-clamp-2 leading-tight ${isDarkMode ? 'text-gray-50' : 'text-gray-900'}`}
                             >
                                 {title}
                             </Typography>
-                            <Box className='flex sm:flex-row sm:justify-between'>
-                                <Box className='flex items-center gap-2 text-primary'>
-                                    <CalendarToday className='text-xs' />
+                            <Box className='flex sm:flex-row sm:justify-between gap-2'>
+                                <Box className='flex items-center gap-2'>
+                                    <CalendarToday className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                                     <Typography
-                                        className={`text-event-meta line-clamp-1 ${isDarkMode ? 'text-event-meta-primary' : 'text-event-meta-light'}`}
+                                        className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-blue-400' : 'text-gray-600'}`}
                                     >
                                         {formatSmartDate(start_date, false)}
                                     </Typography>
                                 </Box>
-                                <Box className='flex items-center gap-2 text-primary'>
-                                    <LocationOn className='text-xs' />
+                                <Box className='flex items-center gap-2'>
+                                    <LocationOn className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                                     <Typography
-                                        className={`text-event-meta line-clamp-1 ${isDarkMode ? 'text-event-meta-primary' : 'text-event-meta-light'}`}
+                                        className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-blue-400' : 'text-gray-600'}`}
                                     >
                                         {location}
                                     </Typography>
                                 </Box>
                             </Box>
                             <Box className='flex items-center justify-between'>
-                                <AvatarGroup
-                                    max={3}
-                                    total={memberCount}
-                                    spacing={4}
-                                    className='event-card-avatars-large'
-                                >
+                                <AvatarGroup max={3} total={memberCount} spacing={4} className='text'>
                                     {memberAvatars.map((avatar: string, index: number) => (
                                         <Avatar key={index} src={avatar} alt={`Member ${index + 1}`} />
                                     ))}
@@ -124,9 +123,11 @@ export const EventCard = ({
                                             onAction?.(e);
                                         }}
                                         disabled={disabled}
-                                        className={`btn-event-card min-w-20 ${
-                                            isFull ? 'btn-event-card-full' : 'btn-event-card-primary'
-                                        } ${disabled ? 'btn-event-card-disabled' : ''}`}
+                                        className={`min-w-20 h-9 text-sm font-medium rounded-full transition-all duration-200 ${
+                                            isFull 
+                                                ? 'bg-gray-500 text-white' 
+                                                : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-0.5'
+                                        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         {isFull ? 'Full' : 'Join'}
                                     </Button>
@@ -144,7 +145,7 @@ export const EventCard = ({
                                                   }
                                         }
                                         disabled={isCancelled}
-                                        className={`btn-event-card btn-event-card-cancel ${
+                                        className={`h-9 text-sm font-medium rounded-full transition-all duration-200-cancel ${
                                             isCancelled
                                                 ? 'cursor-not-allowed bg-gray-500'
                                                 : isDarkMode
@@ -163,7 +164,7 @@ export const EventCard = ({
                                             e.stopPropagation();
                                             onAction?.(e);
                                         }}
-                                        className='btn-event-card btn-event-card-leave'
+                                        className='h-9 text-sm font-medium rounded-full transition-all duration-200-leave'
                                     >
                                         Leave
                                     </Button>
@@ -184,21 +185,25 @@ export const EventCard = ({
                                 className='h-full w-full rounded-xl object-cover'
                             />
                             {category && (
-                                <Chip label={category} size='small' className='chip-event chip-event-absolute' />
+                                <Chip 
+                                    label={category} 
+                                    size='small' 
+                                    className='absolute top-2 left-2 z-10 text-xs font-medium h-6 rounded-full bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800' 
+                                />
                             )}
                         </Box>
                         <CardContent className='mt-2 p-0'>
                             <Typography
                                 variant='h6'
-                                className={`text-event-title mt-2 line-clamp-2 ${isDarkMode ? 'text-event-title-dark' : 'text-event-title-light'}`}
+                                className={`text-sm font-semibold mt-2 line-clamp-2 ${isDarkMode ? 'text-gray-50' : 'text-gray-900'}`}
                             >
                                 {title}
                             </Typography>
                             {location && (
-                                <Box className='mt-2 flex items-center gap-2 text-primary'>
-                                    <LocationOn className='text-xs' />
+                                <Box className='mt-2 flex items-center gap-2'>
+                                    <LocationOn className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                                     <Typography
-                                        className={`text-event-meta line-clamp-1 ${isDarkMode ? 'text-event-meta-primary' : 'text-event-meta-light'}`}
+                                        className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-blue-400' : 'text-gray-600'}`}
                                     >
                                         {location}
                                     </Typography>
@@ -223,7 +228,7 @@ export const EventCard = ({
                                 <Box className='flex items-center gap-3'>
                                     {price !== undefined && (
                                         <Typography
-                                            className={`text-event-price ${isDarkMode ? 'text-event-price-dark' : 'text-event-price-light'}`}
+                                            className={`text-sm font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}
                                         >
                                             {price && price > 0 ? formatPrice(price) : 'Free'}
                                         </Typography>
@@ -242,10 +247,10 @@ export const EventCard = ({
                                                     }
                                                 }}
                                                 disabled={!isEnabled || isLoading}
-                                                className={`btn-event-card btn-event-card-favorite ${
+                                                className={`w-8 h-8 rounded-full transition-all duration-200 ${
                                                     isFavorite
-                                                        ? 'border-red-300 bg-red-100 text-red-600 hover:bg-red-200'
-                                                        : 'border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50'
+                                                        ? 'border-2 border-red-300 bg-red-100 text-red-600 hover:bg-red-200'
+                                                        : 'border-2 border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
                                                 }`}
                                             >
                                                 <Favorite
@@ -267,20 +272,20 @@ export const EventCard = ({
                         <Box className='flex w-full flex-col justify-between'>
                             <Typography
                                 variant='body2'
-                                className={`text-event-title line-clamp-2 ${isDarkMode ? 'text-event-title-dark' : 'text-event-title-light'}`}
+                                className={`text-sm font-semibold line-clamp-2 ${isDarkMode ? 'text-gray-50' : 'text-gray-900'}`}
                             >
                                 {title}
                             </Typography>
-                            <Box className='flex items-center gap-2 text-primary'>
-                                <CalendarToday className='text-xs' />
-                                <Typography className='text-event-meta line-clamp-1'>
+                            <Box className='flex items-center gap-2'>
+                                <CalendarToday className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                                <Typography className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-blue-400' : 'text-gray-600'}`}>
                                     {formatSmartDate(start_date, true)}
                                 </Typography>
                             </Box>
                             <Box className='flex items-center justify-between'>
                                 <Typography
                                     variant='body2'
-                                    className={`text-event-price ${isDarkMode ? 'text-event-price-dark' : 'text-event-price-light'}`}
+                                    className={`text-sm font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}
                                 >
                                     {price ? formatPrice(price) : 'Free'}
                                 </Typography>
@@ -290,9 +295,11 @@ export const EventCard = ({
                                         size='small'
                                         onClick={onAction}
                                         disabled={disabled}
-                                        className={`btn-event-card ${
-                                            isFull ? 'btn-event-card-full' : 'btn-event-card-primary'
-                                        } ${disabled ? 'btn-event-card-disabled' : ''}`}
+                                        className={`h-9 text-sm font-medium rounded-full transition-all duration-200 ${
+                                            isFull 
+                                                ? 'bg-gray-500 text-white' 
+                                                : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-0.5'
+                                        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         {isFull ? 'Full' : 'Join'}
                                     </Button>
@@ -303,7 +310,7 @@ export const EventCard = ({
                                         size='small'
                                         onClick={isCancelled ? undefined : onAction}
                                         disabled={isCancelled}
-                                        className={`btn-event-card btn-event-card-cancel ${
+                                        className={`h-9 text-sm font-medium rounded-full transition-all duration-200-cancel ${
                                             isCancelled
                                                 ? 'cursor-not-allowed bg-gray-500'
                                                 : isDarkMode
@@ -322,7 +329,7 @@ export const EventCard = ({
                                             e.stopPropagation();
                                             onAction?.(e);
                                         }}
-                                        className='btn-event-card btn-event-card-leave'
+                                        className='h-9 text-sm font-medium rounded-full transition-all duration-200-leave'
                                     >
                                         Leave
                                     </Button>
@@ -341,7 +348,7 @@ export const EventCard = ({
                                 <Box className='flex items-start justify-between gap-2'>
                                     <Typography
                                         variant='h6'
-                                        className={`text-event-title line-clamp-2 flex-1 leading-tight ${isDarkMode ? 'text-event-title-dark' : 'text-event-title-light'}`}
+                                        className={`text-sm font-semibold line-clamp-2 flex-1 leading-tight ${isDarkMode ? 'text-gray-50' : 'text-gray-900'}`}
                                     >
                                         {title}
                                     </Typography>
@@ -349,17 +356,15 @@ export const EventCard = ({
                                         <Chip
                                             label={category}
                                             size='small'
-                                            className={`chip-event chip-event-inline ${
-                                                isDarkMode ? 'chip-event-dark' : 'chip-event-light'
-                                            }`}
+                                            className='text-xs font-medium h-5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800'
                                         />
                                     )}
                                 </Box>
                                 {start_date && (
-                                    <Box className='mt-2 flex items-center gap-2 text-primary'>
-                                        <CalendarToday className='text-xs' />
+                                    <Box className='mt-2 flex items-center gap-2'>
+                                        <CalendarToday className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                                         <Typography
-                                            className={`text-event-meta line-clamp-1 ${isDarkMode ? 'text-event-meta-primary' : 'text-event-meta-light'}`}
+                                            className={`text-xs font-medium line-clamp-1 ${isDarkMode ? 'text-blue-400' : 'text-gray-600'}`}
                                         >
                                             {formatSmartDate(start_date, true)}
                                         </Typography>
@@ -370,7 +375,7 @@ export const EventCard = ({
                                     <Box className='flex items-center gap-3'>
                                         <Typography
                                             variant='body2'
-                                            className={`text-event-price ${isDarkMode ? 'text-event-price-dark' : 'text-event-price-light'}`}
+                                            className={`text-sm font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}
                                         >
                                             {price ? formatPrice(price) : 'Free'}
                                         </Typography>
@@ -384,9 +389,11 @@ export const EventCard = ({
                                                 onAction?.(e);
                                             }}
                                             disabled={disabled}
-                                            className={`btn-event-card ${
-                                                isFull ? 'btn-event-card-full' : 'btn-event-card-primary'
-                                            } ${disabled ? 'btn-event-card-disabled' : ''}`}
+                                            className={`h-9 text-sm font-medium rounded-full transition-all duration-200 ${
+                                                isFull 
+                                                    ? 'bg-gray-500 text-white' 
+                                                    : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-0.5'
+                                            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             {isFull ? 'Full' : 'Join'}
                                         </Button>
@@ -405,10 +412,10 @@ export const EventCard = ({
                                                     }
                                                 }}
                                                 disabled={!isEnabled || isLoading}
-                                                className={`btn-event-card btn-event-card-favorite ${
+                                                className={`w-8 h-8 rounded-full transition-all duration-200 ${
                                                     isFavorite
-                                                        ? 'border-red-300 bg-red-100 text-red-600 hover:bg-red-200'
-                                                        : 'border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50'
+                                                        ? 'border-2 border-red-300 bg-red-100 text-red-600 hover:bg-red-200'
+                                                        : 'border-2 border-gray-300 bg-white text-gray-600 hover:bg-gray-50'
                                                 }`}
                                             >
                                                 <Favorite
@@ -430,7 +437,7 @@ export const EventCard = ({
                                                       }
                                             }
                                             disabled={isCancelled}
-                                            className={`btn-event-card btn-event-card-cancel ${
+                                            className={`h-9 text-sm font-medium rounded-full transition-all duration-200-cancel ${
                                                 isCancelled
                                                     ? 'cursor-not-allowed bg-gray-500'
                                                     : isDarkMode
@@ -449,7 +456,7 @@ export const EventCard = ({
                                                 e.stopPropagation();
                                                 onAction?.(e);
                                             }}
-                                            className='btn-event-card btn-event-card-leave'
+                                            className='h-9 text-sm font-medium rounded-full transition-all duration-200-leave'
                                         >
                                             Leave
                                         </Button>
@@ -459,7 +466,7 @@ export const EventCard = ({
                                             variant='contained'
                                             size='small'
                                             onClick={e => e.stopPropagation()}
-                                            className={`btn-event-card btn-event-card-cancel ${
+                                            className={`h-9 text-sm font-medium rounded-full transition-all duration-200-cancel ${
                                                 isCancelled
                                                     ? isDarkMode
                                                         ? 'bg-red-600'
@@ -482,7 +489,7 @@ export const EventCard = ({
                                     <Button
                                         variant='outlined'
                                         size='small'
-                                        className='btn-event-card btn-event-card-outline'
+                                        className='h-9 text-sm font-medium rounded-full transition-all duration-200-outline'
                                         onClick={e => e.stopPropagation()}
                                     >
                                         Leave Review
@@ -490,7 +497,7 @@ export const EventCard = ({
                                     <Button
                                         variant='contained'
                                         size='small'
-                                        className='btn-event-card btn-event-card-outline'
+                                        className='h-9 text-sm font-medium rounded-full transition-all duration-200-outline'
                                         onClick={e => e.stopPropagation()}
                                     >
                                         View Ticket
@@ -509,7 +516,7 @@ export const EventCard = ({
     return (
         <Box onClick={handleCardClick} className='cursor-pointer'>
             <Card
-                className={`event-card flex flex-col overflow-hidden rounded-2xl p-3 ${variant === 'vertical' && 'max-h-80 min-h-72 w-60 gap-3'} ${variant === 'horizontal-compact' && 'h-24 w-full'} ${variant === 'vertical-compact' && 'h-56 w-40'} ${variant === 'horizontal' ? (isComplete ? 'h-48' : 'h-32') + ' w-full' : ''} ${className} `}
+                className={`flex flex-col overflow-hidden rounded-2xl p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${variant === 'vertical' && 'max-h-80 min-h-72 w-60 gap-3'} ${variant === 'horizontal-compact' && 'h-24 w-full'} ${variant === 'vertical-compact' && 'h-56 w-40'} ${variant === 'horizontal' ? (isComplete ? 'h-48' : 'h-32') + ' w-full' : ''} ${className} `}
             >
                 {renderContent()}
             </Card>
@@ -517,3 +524,4 @@ export const EventCard = ({
     );
 };
 export default EventCard;
+

@@ -42,7 +42,5 @@ export const useDataStore = create<DataState>((set) => ({
     meetupCreation: { ...state.meetupCreation, step }
   })),
   
-  resetMeetupCreation: () => set({
-    meetupCreation: initialMeetupCreation
-  }),
+  resetMeetupCreation: () => set({ meetupCreation: initialMeetupCreation }),
 }));

@@ -1,40 +1,30 @@
 import { createTheme } from '@mui/material/styles';
-import { designTokens } from './designTokens';
+
 const createBaseTheme = (isDarkMode: boolean) => createTheme({
   palette: {
     mode: isDarkMode ? 'dark' : 'light',
     primary: {
-      main: designTokens.colors.primary,
-      contrastText: '#FFFFFF',
+      main: '#5D9BFC',
     },
     secondary: {
-      main: designTokens.colors.neutral[600],
-      contrastText: '#FFFFFF',
+      main: '#4B5563',
     },
     error: {
-      main: designTokens.colors.error,
+      main: '#EF4444',
     },
     warning: {
-      main: designTokens.colors.warning,
+      main: '#F59E0B',
     },
     success: {
-      main: designTokens.colors.success,
+      main: '#10B981',
     },
     info: {
-      main: designTokens.colors.info,
-    },
-    background: {
-      default: isDarkMode ? '#0F172A' : '#F9FAFB',
-      paper: isDarkMode ? '#1E293B' : '#FFFFFF',
-    },
-    text: {
-      primary: isDarkMode ? '#F8FAFC' : '#111827',
-      secondary: isDarkMode ? '#CBD5E1' : '#4B5563',
+      main: '#3B82F6',
     },
   },
   
   typography: {
-    fontFamily: designTokens.typography.fontFamily.primary,
+    fontFamily: '"Plus Jakarta Sans", sans-serif',
     
     h1: {
       fontSize: '1.875rem',
@@ -103,10 +93,18 @@ const createBaseTheme = (isDarkMode: boolean) => createTheme({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
-          backgroundColor: isDarkMode ? '#1C2039' : '#F9FAFB',
           overflowY: 'auto',
-          boxShadow: isDarkMode ? 'none' : '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          borderRadius: isDarkMode ? '0' : '12px',
+          background: isDarkMode 
+            ? 'rgba(15, 23, 42, 0.8)' 
+            : 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(20px)',
+          border: isDarkMode 
+            ? '1px solid rgba(255, 255, 255, 0.1)' 
+            : '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: isDarkMode 
+            ? '0 8px 32px rgba(0, 0, 0, 0.3)' 
+            : '0 8px 32px rgba(0, 0, 0, 0.1)',
+          borderRadius: '20px',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           '&::-webkit-scrollbar': {
@@ -122,17 +120,10 @@ const createBaseTheme = (isDarkMode: boolean) => createTheme({
           textTransform: 'none',
           boxShadow: 'none',
           borderRadius: '9999px',
-          fontFamily: designTokens.typography.fontFamily.primary,
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           height: '48px',
           '&:hover': {
             boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-          },
-        },
-        contained: {
-          backgroundColor: designTokens.colors.primary,
-          color: '#FFFFFF',
-          '&:hover': {
-            backgroundColor: designTokens.colors.primaryHover,
           },
         },
         sizeLarge: {
@@ -145,7 +136,17 @@ const createBaseTheme = (isDarkMode: boolean) => createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+          background: isDarkMode 
+            ? 'rgba(30, 41, 59, 0.6)' 
+            : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: isDarkMode 
+            ? '1px solid rgba(255, 255, 255, 0.1)' 
+            : '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: isDarkMode 
+            ? '0 4px 16px rgba(0, 0, 0, 0.2)' 
+            : '0 4px 16px rgba(0, 0, 0, 0.1)',
+          borderRadius: '16px',
         },
       },
     },
@@ -162,6 +163,41 @@ const createBaseTheme = (isDarkMode: boolean) => createTheme({
       styleOverrides: {
         root: {
           borderRadius: '50%',
+          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+          color: isDarkMode ? '#CBD5E1' : '#4B5563',
+          border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+          '&:hover': {
+            backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+            color: isDarkMode ? '#F1F5F9' : '#374151',
+          },
+          '&.Mui-disabled': {
+            backgroundColor: '#e5e7eb',
+            color: '#6b7280',
+            border: '2px solid #d1d5db',
+            '& svg': {
+              color: '#6b7280',
+            },
+          },
+          // Override custom background classes
+          '&.bg-gray-100': {
+            backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+            color: isDarkMode ? '#CBD5E1' : '#4B5563',
+            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+          },
+          '&.bg-gray-700': {
+            backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+            color: isDarkMode ? '#CBD5E1' : '#4B5563',
+          },
+          '&.bg-blue-100': {
+            backgroundColor: isDarkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)',
+            color: isDarkMode ? '#93C5FD' : '#2563EB',
+            border: isDarkMode ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(59, 130, 246, 0.2)',
+          },
+          '&.bg-blue-500\\/20': {
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            color: '#93C5FD',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+          },
         },
       },
     },
@@ -193,28 +229,18 @@ const createBaseTheme = (isDarkMode: boolean) => createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             borderRadius: '9999px',
-            backgroundColor: isDarkMode ? '#334155' : '#F3F4F6',
-            border: isDarkMode ? '1px solid #475569' : '1px solid #E5E7EB',
             '& fieldset': {
-              border: 'none',
+              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
             },
             '&:hover fieldset': {
-              border: 'none',
+              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
             },
             '&.Mui-focused fieldset': {
-              border: 'none',
+              borderColor: '#5D9BFC',
+              borderWidth: '2px',
             },
             '&.MuiInputBase-multiline': {
               borderRadius: '12px',
-            },
-          },
-          '& .MuiInputLabel-root': {
-            color: isDarkMode ? '#64748B' : '#9CA3AF',
-          },
-          '& .MuiInputBase-input': {
-            color: isDarkMode ? 'white' : '#111827',
-            '&::placeholder': {
-              color: isDarkMode ? '#64748B' : '#9CA3AF',
             },
           },
         },
@@ -226,22 +252,6 @@ const createBaseTheme = (isDarkMode: boolean) => createTheme({
           borderRadius: '9999px',
           textTransform: 'none',
           fontWeight: 500,
-          '&.Mui-selected': {
-            backgroundColor: '#5D9BFC',
-            color: 'white',
-            borderColor: '#5D9BFC',
-            '&:hover': {
-              backgroundColor: '#4A8BFC',
-            },
-          },
-          '&:not(.Mui-selected)': {
-            backgroundColor: isDarkMode ? '#374151' : '#F3F4F6',
-            color: isDarkMode ? 'white' : '#374151',
-            borderColor: isDarkMode ? '#4B5563' : '#D1D5DB',
-            '&:hover': {
-              backgroundColor: isDarkMode ? '#4B5563' : '#E5E7EB',
-            },
-          },
         },
       },
     },

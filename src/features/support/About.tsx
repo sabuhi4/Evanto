@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography, Container } from '@mui/material';
 import { KeyboardArrowRight } from '@mui/icons-material';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import LogoLight from '@/assets/icons/logo-light.svg?react';
 import LogoDark from '@/assets/icons/logo-dark.svg?react';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -10,7 +10,7 @@ import { BottomAppBar } from '@/components/navigation/BottomAppBar';
 
 function About() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const handleBack = () => {
         navigate(-1);
@@ -109,3 +109,4 @@ function About() {
 }
 
 export default About;
+

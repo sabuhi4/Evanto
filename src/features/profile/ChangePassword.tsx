@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Typography, Button, IconButton, InputAdornment, CircularProgress } from '@mui/material';
@@ -51,7 +51,7 @@ function ChangePassword() {
         });
 
         if (authError) {
-            toast.error('Current password is incorrect');
+            showError('Current password is incorrect');
             return;
         }
 
@@ -59,11 +59,11 @@ function ChangePassword() {
         const { error } = await supabase.auth.updateUser({ password: newPassword });
 
         if (error) {
-            toast.error(error.message);
+            showError(error.message);
             return;
         }
 
-        toast.success('Password updated successfully!');
+        showSuccess('Password updated successfully!');
         setTimeout(() => navigate(-1), 1500);
     };
 

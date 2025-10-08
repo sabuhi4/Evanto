@@ -7,7 +7,6 @@ import {
     setDefaultPaymentCard,
 } from '@/services';
 
-
 export const usePaymentCards = () => {
     return useQuery({
         queryKey: ['payment-cards'],

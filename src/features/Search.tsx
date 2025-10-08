@@ -10,6 +10,7 @@ import {
 } from '@mui/icons-material';
 import { Container } from '@mui/material';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import EventCard from '@/components/cards/EventCard';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useFiltersStore } from '@/store/filtersStore';
@@ -18,15 +19,15 @@ import { usePagination } from '@/hooks/usePagination';
 import { Box, Button } from '@mui/material';
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
 import { FilterModal } from '@/components/layout/FilterModal';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
-import { hasActiveFilters, resetAllFilters } from '@/utils/filterUtils';
+import { hasActiveFilters, getFilteredItems } from '@/utils/filterUtils';
 
 function Search() {
     const [cardVariant, setCardVariant] = useState<'horizontal' | 'vertical-compact'>('horizontal');
     const [isFilterOpen, setFilterOpen] = useState(false);
     const { getVisibleItems, loadMore, hasMore, getRemainingCount } = usePagination();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const navigate = useNavigate();
     const { 
@@ -40,21 +41,33 @@ function Search() {
         eventType,
         dateFilter,
         setDateFilter,
-        locationFilter
+        locationFilter,
+        resetFilters
     } = useFiltersStore();
     
     // Use unified data fetching
     const { data: items = [] } = useUnifiedItems();
     
-    // Use centralized filtering logic from store
-    const { getFilteredItems } = useFiltersStore();
-    const filteredItems = getFilteredItems(items);
+    // Use centralized filtering logic from utils
+    const filters = useFiltersStore();
+    const filteredItems = getFilteredItems(items, {
+        categoryFilter,
+        searchQuery,
+        locationFilter,
+        priceRange: [minPrice, maxPrice],
+        minPrice,
+        maxPrice,
+        eventType,
+        dateFilter
+    });
 
 
 
     return (
         <>
-            
+            <Box className='absolute right-4 top-4 z-10'>
+                <ThemeToggle />
+            </Box>
             <Container className='relative min-h-screen'>
                 <Box className='no-scrollbar w-full overflow-y-auto'>
                     <PageHeader 
@@ -86,10 +99,19 @@ function Search() {
                     >
                         <TuneOutlined />
                     </IconButton>
-                    {hasActiveFilters() && (
+                    {hasActiveFilters({
+                        categoryFilter,
+                        searchQuery,
+                        locationFilter,
+                        priceRange: [minPrice, maxPrice],
+                        minPrice,
+                        maxPrice,
+                        eventType,
+                        dateFilter
+                    }) && (
                         <IconButton
                             size='small'
-                            onClick={resetAllFilters}
+                            onClick={resetFilters}
                             className='border border-gray-300 text-xs px-2 py-1'
                         >
                             Clear
@@ -98,7 +120,16 @@ function Search() {
                 </Box>
                 
                 {/* Active Filters Summary */}
-                {hasActiveFilters() && (
+                {hasActiveFilters({
+                    categoryFilter,
+                    searchQuery,
+                    locationFilter,
+                    priceRange: [minPrice, maxPrice],
+                    minPrice,
+                    maxPrice,
+                    eventType,
+                    dateFilter
+                }) && (
                     <Box className={`mb-4 p-3 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
                         <Typography variant='body2' className={`mb-2 font-jakarta ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Active filters:
@@ -193,14 +224,14 @@ function Search() {
                         <IconButton
                             size='small'
                             onClick={() => setCardVariant('horizontal')}
-                            className={cardVariant === 'horizontal' ? 'text-primary' : `${isDarkMode ? 'text-gray-400' : 'text-text-muted'}`}
+                            className={cardVariant === 'horizontal' ? 'text-primary' : `${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
                         >
                             <ListOutlined />
                         </IconButton>
                         <IconButton
                             size='small'
                             onClick={() => setCardVariant('vertical-compact')}
-                            className={cardVariant === 'vertical-compact' ? 'text-primary' : `${isDarkMode ? 'text-gray-400' : 'text-text-muted'}`}
+                            className={cardVariant === 'vertical-compact' ? 'text-primary' : `${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}
                         >
                             <GridViewOutlined />
                         </IconButton>
@@ -239,7 +270,16 @@ function Search() {
                         })
                     ) : (
                         <Typography variant='body2' className={`py-4 text-center font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                            {hasActiveFilters()
+                            {hasActiveFilters({
+                                categoryFilter,
+                                searchQuery,
+                                locationFilter,
+                                priceRange: [minPrice, maxPrice],
+                                minPrice,
+                                maxPrice,
+                                eventType,
+                                dateFilter
+                            })
                                 ? 'No items match your current filters. Try adjusting your search criteria.'
                                 : 'No upcoming events found.'
                             }

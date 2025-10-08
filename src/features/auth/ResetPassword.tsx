@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Typography, Button, IconButton, InputAdornment, CircularProgress } from '@mui/material';
@@ -28,39 +28,39 @@ function ResetPassword() {
         const { password, confirmPassword } = data;
 
         if (password !== confirmPassword) {
-            toast.error('Passwords do not match');
+            showError('Passwords do not match');
             return;
         }
 
         const { error } = await supabase.auth.updateUser({ password });
 
         if (error) {
-            toast.error(error.message);
+            showError(error.message);
             return;
         }
 
-        toast.success('Password updated successfully!');
+        showSuccess('Password updated successfully!');
         setTimeout(() => navigate('/onboarding/congratulations', { state: { context: 'password' } }), 1500);
     };
     return (
         <Container className='relative'>
             <Box className='w-full overflow-y-auto'>
                 <Box className='mb-8 flex w-full items-center justify-between'>
-                    <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                    <IconButton size='medium' onClick={() => navigate(-1)} className="" sx={{ borderRadius: '50%' }}>
                         <KeyboardArrowLeft />
                     </IconButton>
-                    <Typography variant='h5' className="text-heading">Reset Password</Typography>
+                    <Typography variant='h5' className="text-gray-900 dark:text-white">Reset Password</Typography>
                     <Box className='w-10' />
                 </Box>
                 
-                <Box className='auth-container'>
+                <Box className='flex flex-col gap-6 text-start'>
                     <img src='/illustrations/lockillustration.png' className='mb-8 max-w-xs mx-auto' alt='Lock illustration' />
                     
                     <Typography variant='body1' className='mb-8 text-center'>
                         Enter your new password below.
                     </Typography>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className='auth-form'>
+                    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-6'>
                         <TextField
                             label='New Password'
                             placeholder='Enter new password'

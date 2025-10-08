@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { showSuccess, showError } from '@/utils/notifications';
 import { Box, Grid2, Typography, Button } from '@mui/material';
 import { Container } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { ArrowCircleLeft } from '@mui/icons-material';
 import { getCategoryIcon } from '@/components/icons/CategoryIcon';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 const interests = [
     { label: 'Music', iconName: 'music_note' },
@@ -22,7 +22,8 @@ function ChooseYourInterests() {
     const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const { isDarkMode, toggleDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
+    const toggleDarkMode = useUserStore(state => state.toggleDarkMode);
 
     const handleInterestClick = (interest: string) => {
         setSelectedInterests(prev =>
@@ -41,7 +42,7 @@ function ChooseYourInterests() {
                 const { data: { user: authUser } } = await supabase.auth.getUser();
                 
                 if (!authUser) {
-                    toast.error('User not found. Please try signing up again.');
+                    showError('User not found. Please try signing up again.');
                     navigate('/auth/sign-up');
                     return;
                 }
@@ -63,24 +64,18 @@ function ChooseYourInterests() {
                 };
             }
 
-            console.log('Waiting for session to be established...');
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             const { supabase } = await import('@/utils/supabase');
             const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-            console.log('Session check:', sessionData, sessionError);
             
             if (sessionError || !sessionData.session) {
-                toast.error('Session not ready. Please try again.');
+                showError('Session not ready. Please try again.');
                 return;
             }
 
-            console.log('Updating interests for user:', user.id);
-            console.log('Session user ID:', sessionData.session?.user?.id);
-            console.log('Selected interests:', selectedInterests);
             
             const sessionUserId = sessionData.session?.user?.id;
-            console.log('Using session user ID:', sessionUserId);
             
             const { data: checkData, error: checkError } = await supabase
                 .from('users')
@@ -88,13 +83,10 @@ function ChooseYourInterests() {
                 .eq('id', sessionUserId)
                 .single();
             
-            console.log('User check result:', checkData);
-            console.log('User check error:', checkError);
             
             let userData;
             
             if (checkError && checkError.code === 'PGRST116') {
-                console.log('User not found, creating user profile...');
                 
                 const { data: insertData, error: insertError } = await supabase
                     .from('users')
@@ -110,8 +102,6 @@ function ChooseYourInterests() {
                     .select()
                     .single();
                 
-                console.log('Insert result:', insertData);
-                console.log('Insert error:', insertError);
                 
                 if (insertError) {
                     throw insertError;
@@ -121,7 +111,6 @@ function ChooseYourInterests() {
             } else if (checkError) {
                 throw checkError;
             } else {
-                console.log('User exists, updating interests...');
                 
                 const { data, error } = await supabase
                     .from('users')
@@ -132,8 +121,6 @@ function ChooseYourInterests() {
                     .eq('id', sessionUserId)
                     .select();
                 
-                console.log('Update result:', data);
-                console.log('Update error:', error);
                 
                 if (error) {
                     throw error;
@@ -142,11 +129,11 @@ function ChooseYourInterests() {
                 userData = data;
             }
 
-            toast.success('Interests saved successfully!');
+            showSuccess('Interests saved successfully!');
             navigate('/onboarding/congratulations', { state: { context: 'account' } });
         } catch (error) {
             console.error('Save interests error:', error);
-            toast.error('Failed to save interests. Please try again.');
+            showError('Failed to save interests. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -243,3 +230,4 @@ function ChooseYourInterests() {
 }
 
 export default ChooseYourInterests;
+

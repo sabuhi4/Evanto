@@ -2,13 +2,13 @@ import { Container } from '@mui/material';
 import { Box, List, ListItem, ListItemIcon, ListItemText, Switch, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BottomAppBar } from '@/components/navigation/BottomAppBar';
 
 function Notification() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const handleBack = () => {
         navigate(-1);
@@ -103,3 +103,4 @@ function Notification() {
 }
 
 export default Notification;
+

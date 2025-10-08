@@ -15,10 +15,9 @@ import { useUnifiedItems } from '@/hooks/useUnifiedItems';
 import { usePagination } from '@/hooks/usePagination';
 import type { UnifiedItem } from '@/utils/schemas';
 import { useUserStore } from '@/store/userStore';
-import { useDeleteEvent } from '@/hooks/entityConfigs';
-import { useDeleteMeetup } from '@/hooks/entityConfigs';
-import toast from 'react-hot-toast';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useDeleteEvent } from '@/hooks/useData';
+import { useDeleteMeetup } from '@/hooks/useData';
+import { showSuccess, showError } from '@/utils/notifications';
 import { ContainerDialog } from '@/components/dialogs/ContainerDialog';
 
 function ManageEvents() {
@@ -26,7 +25,7 @@ function ManageEvents() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<UnifiedItem | null>(null);
     const { getVisibleItems, loadMore, hasMore, getRemainingCount } = usePagination();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     
     const navigate = useNavigate();
     const user = useUserStore(state => state.user);
@@ -57,7 +56,7 @@ function ManageEvents() {
             // Navigate to edit page with item data and type
             navigate(`/events/${item.id}/edit`, { state: { item, itemType: item.type } });
         } catch (error) {
-            toast.error('Failed to edit item');
+            showError('Failed to edit item');
         }
     };
 
@@ -74,25 +73,25 @@ function ManageEvents() {
         if (itemToDelete.type === 'event') {
             deleteEventMutation.mutate(itemToDelete.id as string, {
                 onSuccess: () => {
-                    toast.success('Event deleted successfully');
+                    showSuccess('Event deleted successfully');
                     setDeleteDialogOpen(false);
                     setItemToDelete(null);
                 },
                 onError: (error) => {
                     console.error('Delete error:', error);
-                    toast.error('Failed to delete event');
+                    showError('Failed to delete event');
                 }
             });
         } else if (itemToDelete.type === 'meetup') {
             deleteMeetupMutation.mutate(itemToDelete.id as string, {
                 onSuccess: () => {
-                    toast.success('Meetup deleted successfully');
+                    showSuccess('Meetup deleted successfully');
                     setDeleteDialogOpen(false);
                     setItemToDelete(null);
                 },
                 onError: (error) => {
                     console.error('Delete error:', error);
-                    toast.error('Failed to delete meetup');
+                    showError('Failed to delete meetup');
                 }
             });
         }
@@ -109,7 +108,7 @@ function ManageEvents() {
         return (
             <>
                 <Container className="relative min-h-screen">
-                    <Typography variant="h6" className="text-center text-muted">
+                    <Typography variant="h6" className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         Please sign in to manage your events
                     </Typography>
                 </Container>
@@ -126,18 +125,18 @@ function ManageEvents() {
                     <Box className="flex items-center  mb-8 w-full mx-auto">
                         <IconButton 
                             onClick={() => navigate(-1)} 
-                            className="text-muted border border-neutral-200 bg-gray-100 dark:bg-gray-700 rounded-full"
+                            className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} border border-neutral-200 bg-gray-100 dark:bg-gray-700 rounded-full`}
                         >
                             <KeyboardArrowLeft />
                         </IconButton>
-                        <Typography variant="h5" className="text-primary mx-auto">Manage Events</Typography>
+                        <Typography variant="h5" className="text-blue-500 dark:text-blue-400 mx-auto">Manage Events</Typography>
                     </Box>
                     <Box className="flex gap-3 w-full">
                         <Button
                             variant="contained"
                             startIcon={<Add />}
                             onClick={handleCreateEvent}
-                            className="bg-primary text-white flex-1"
+                            className="bg-blue-500 hover:bg-blue-600 text-white flex-1"
                             size="small"
                             sx={{ 
                                 textTransform: 'none',
@@ -152,7 +151,7 @@ function ManageEvents() {
                             variant="contained"
                             startIcon={<Add />}
                             onClick={handleCreateMeetup}
-                            className="bg-primary text-white flex-1"
+                            className="bg-blue-500 hover:bg-blue-600 text-white flex-1"
                             size="small"
                             sx={{ 
                                 textTransform: 'none',
@@ -169,28 +168,28 @@ function ManageEvents() {
                 {/* Stats */}
                 <Box className={`grid h-20 w-full grid-cols-[1fr_auto_1fr_auto_1fr] items-center rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-neutral-50'}`}>
                     <Box className="text-center">
-                        <Typography variant="h4" className="text-primary">
+                        <Typography variant="h4" className="text-blue-500 dark:text-blue-400">
                             {userEvents.length}
                         </Typography>
-                        <Typography variant="body2" className="text-muted">
+                        <Typography variant="body2" className="${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}">
                             Events
                         </Typography>
                     </Box>
                     <Divider orientation="vertical" flexItem className="h-10 self-center" />
                     <Box className="text-center">
-                        <Typography variant="h4" className="text-primary">
+                        <Typography variant="h4" className="text-blue-500 dark:text-blue-400">
                             {userEvents.filter(e => e.featured).length}
                         </Typography>
-                        <Typography variant="body2" className="text-muted">
+                        <Typography variant="body2" className="${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}">
                             Featured
                         </Typography>
                     </Box>
                     <Divider orientation="vertical" flexItem className="h-10 self-center" />
                     <Box className="text-center">
-                        <Typography variant="h4" className="text-primary">
+                        <Typography variant="h4" className="text-blue-500 dark:text-blue-400">
                             {userEvents.filter(e => e.type === 'meetup' && e.status === 'active').length}
                         </Typography>
-                        <Typography variant="body2" className="text-muted">
+                        <Typography variant="body2" className="${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}">
                             Online
                         </Typography>
                     </Box>
@@ -198,21 +197,21 @@ function ManageEvents() {
 
                 {/* View Toggle */}
                 <Box className="mb-4 flex w-full items-center justify-between">
-                    <Typography variant="body2" className={`text-primary ${isDarkMode ? 'text-primary' : 'text-primary'}`}>
+                    <Typography variant="body2" className="text-blue-500 dark:text-blue-400">
                         {userEvents.length} events found
                     </Typography>
                     <Stack direction="row">
                         <IconButton
                             size="small"
                             onClick={() => setCardVariant('horizontal')}
-                            className={cardVariant === 'horizontal' ? 'text-primary' : 'text-muted'}
+                            className={cardVariant === 'horizontal' ? 'text-blue-500 dark:text-blue-400' : `${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}
                         >
                             <ListOutlined />
                         </IconButton>
                         <IconButton
                             size="small"
                             onClick={() => setCardVariant('vertical-compact')}
-                            className={cardVariant === 'vertical-compact' ? 'text-primary' : 'text-muted'}
+                            className={cardVariant === 'vertical-compact' ? 'text-blue-500 dark:text-blue-400' : `${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}
                         >
                             <GridViewOutlined />
                         </IconButton>
@@ -222,7 +221,7 @@ function ManageEvents() {
                 {/* Events Grid/List */}
                 {loading ? (
                     <Box className="flex justify-center py-8">
-                        <Typography variant="body2" className="text-muted">
+                        <Typography variant="body2" className="${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}">
                             Loading your events...
                         </Typography>
                     </Box>
@@ -301,16 +300,16 @@ function ManageEvents() {
                     </Box>
                 ) : (
                     <Box className={`rounded-2xl p-8 text-center ${isDarkMode ? 'bg-gray-800' : 'bg-neutral-50'}`}>
-                        <Typography variant="h6" className="mb-2 text-muted">
+                        <Typography variant="h6" className="mb-2 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}">
                             No events yet
                         </Typography>
-                        <Typography variant="body2" className="mb-4 text-muted">
+                        <Typography variant="body2" className="mb-4 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}">
                             Start creating your first event to get started
                         </Typography>
                         <Button
                             variant="contained"
                             onClick={handleCreateEvent}
-                            className="bg-primary-1 text-white"
+                            className="bg-blue-500 hover:bg-blue-600 text-white"
                             sx={{ textTransform: 'none' }}
                         >
                             Create Your First Event
@@ -325,7 +324,7 @@ function ManageEvents() {
                     maxWidth="sm"
                     fullWidth
                 >
-                    <DialogTitle className='font-jakarta font-semibold text-primary'>
+                    <DialogTitle className='font-jakarta font-semibold text-blue-500 dark:text-blue-400'>
                         Confirm Deletion
                     </DialogTitle>
                     <DialogContent>
@@ -368,3 +367,4 @@ function ManageEvents() {
 }
 
 export default ManageEvents;
+

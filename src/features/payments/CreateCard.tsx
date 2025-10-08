@@ -7,11 +7,11 @@ import { useDeletePaymentCard, useSetDefaultPaymentCard } from '@/hooks/usePayme
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError } from '@/utils/notifications';
 import { ContainerDialog } from '@/components/dialogs/ContainerDialog';
-import { useDarkMode } from '@/contexts/DarkModeContext';
+import { useUserStore } from '@/store/userStore';
 
 function CreateCard() {
     const navigate = useNavigate();
-    const { isDarkMode } = useDarkMode();
+    const isDarkMode = useUserStore(state => state.isDarkMode);
     const { data: paymentCards, isLoading, refetch } = usePaymentCards();
     const { mutate: deleteCard } = useDeletePaymentCard();
     const { mutate: setDefaultCard } = useSetDefaultPaymentCard();
@@ -74,10 +74,10 @@ function CreateCard() {
             <>
                 <Container className="relative min-h-screen">
                     <Box className={'mb-8 flex w-full items-center justify-between'}>
-                        <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700">
+                        <IconButton size='medium' onClick={() => navigate(-1)} className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} border border-neutral-200 bg-gray-100 dark:bg-gray-700`}>
                             <KeyboardArrowLeftOutlined />
                         </IconButton>
-                        <Typography variant='h4' className="font-jakarta font-semibold text-primary">
+                        <Typography variant='h4' className="font-jakarta font-semibold text-blue-500 dark:text-blue-400">
                             Payment Cards
                         </Typography>
                         <Box className="w-10 h-10" />
@@ -96,7 +96,7 @@ function CreateCard() {
             <Container className="relative min-h-screen">
                 {/* Header */}
                 <Box className={'mb-8 flex w-full items-center justify-between'}>
-                    <IconButton size='medium' onClick={() => navigate(-1)} className="text-text-3 border border-neutral-200 bg-gray-100 dark:bg-gray-700" sx={{ borderRadius: '50%' }}>
+                    <IconButton size='medium' onClick={() => navigate(-1)} className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} border border-neutral-200 bg-gray-100 dark:bg-gray-700`} sx={{ borderRadius: '50%' }}>
                         <KeyboardArrowLeftOutlined />
                     </IconButton>
                     <Typography variant='h4' className={`font-poppins font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -137,7 +137,7 @@ function CreateCard() {
                                                     <Chip 
                                                         label="Default" 
                                                         size="small" 
-                                                        className="bg-primary text-white text-xs"
+                                                        className="bg-blue-500 text-white text-xs"
                                                     />
                                                 )}
                                             </Box>
@@ -155,7 +155,7 @@ function CreateCard() {
                                                     e.stopPropagation();
                                                     handleSetDefault(card.id);
                                                 }}
-                                                className="text-xs px-2 py-1 border-primary text-primary hover:bg-primary/10"
+                                                className="text-xs px-2 py-1 border-blue-500 text-blue-500 hover:bg-blue-50"
                                             >
                                                 Set Default
                                             </Button>
@@ -166,7 +166,7 @@ function CreateCard() {
                                                 e.stopPropagation();
                                                 navigate(`/payments/details?edit=${card.id}`);
                                             }}
-                                            className="text-primary hover:bg-primary/10"
+                                            className="text-blue-500 hover:bg-blue-50"
                                         >
                                             <Edit fontSize="small" />
                                         </IconButton>
@@ -256,7 +256,7 @@ function CreateCard() {
                     <Button
                         variant='outlined'
                         fullWidth
-                        className="h-14 gap-2 border-2 border-dashed border-primary text-primary font-medium text-base hover:border-primary-dark hover:bg-primary/10 hover:text-primary-dark"
+                        className="h-14 gap-2 border-2 border-dashed border-blue-500 text-blue-500 font-medium text-base hover:border-blue-600 hover:bg-blue-50 hover:text-blue-600"
                         onClick={() => navigate('/payments/details')}
                     >
                         <AddCircleOutlineRounded className="h-6 w-6" />
@@ -313,3 +313,4 @@ function CreateCard() {
 }
 
 export default CreateCard;
+
