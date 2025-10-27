@@ -90,3 +90,5 @@ jspm_packages/
 # TernJS port file
 .tern-port
 
+# AI Reference Documentation (private)
+CLAUDE_PROJECT_REFERENCE.md

@@ -1,0 +1,26 @@
+{
+  "name": "Evanto - Event Discovery Platform",
+  "short_name": "Evanto",
+  "description": "Discover and book amazing events, concerts, workshops, and meetups near you",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#5D9BFC",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "180x180",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["entertainment", "lifestyle", "social"],
+  "screenshots": []
+}

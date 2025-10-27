@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Box, Button, Typography, IconButton } from '@mui/material';
 import { KeyboardArrowLeft } from '@mui/icons-material';
 import { Container } from '@mui/material';
@@ -7,19 +6,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
 import { getSeatAvailability } from '@/services/dataService';
 import { useUserStore } from '@/store/userStore';
-import { createBooking } from '@/services/dataService';
 import { showSuccess, showError } from '@/utils/notifications';
+import type { Meetup } from '@/utils/schemas';
 
 function JoinMeetup() {
     const navigate = useNavigate();
     const { id: meetupId } = useParams();
-    const user = useUserStore(state => state.user);
-    const [isJoining, setIsJoining] = useState(false);
     const isDarkMode = useUserStore(state => state.isDarkMode);
 
     const { data: items = [] } = useUnifiedItems();
 
-    const meetup = items.find(i => i.id === meetupId && i.type === 'meetup');
+    const meetup = items.find(i => i.id === meetupId && i.type === 'meetup') as Meetup | undefined;
 
     const { data: availability } = useQuery({
         queryKey: ['meetupAvailability', meetupId],
@@ -27,9 +24,9 @@ function JoinMeetup() {
         enabled: !!meetupId && !!meetup,
     });
 
-    const handleJoinMeetup = async () => {
-        if (!user?.id || !meetup) {
-            showError('User not authenticated or meetup not found');
+    const handleJoinMeetup = () => {
+        if (!meetup) {
+            showError('Meetup not found');
             return;
         }
 
@@ -38,26 +35,13 @@ function JoinMeetup() {
             return;
         }
 
-        setIsJoining(true);
-
-        try {
-            await createBooking({
-                user_id: user.id,
-                event_id: meetup.id,
-                order_number: `MEETUP-${Date.now()}`,
-                total_amount: 0, // Meetups are free
-                status: 'confirmed', // Auto-confirm meetups
-                payment_status: 'paid', // No payment needed
-                selected_seats: [], // No seats for meetups
-            });
-
-            showSuccess('Successfully joined the meetup!');
+        // If meetup has a link, open it in a new tab
+        if (meetup.meetup_link) {
+            window.open(meetup.meetup_link, '_blank');
+            showSuccess('Opening meetup link...');
             navigate('/home');
-        } catch (error: any) {
-            console.error('Error joining meetup:', error);
-            showError(error.message || 'Failed to join meetup');
-        } finally {
-            setIsJoining(false);
+        } else {
+            showError('No meetup link available');
         }
     };
 
@@ -121,7 +105,6 @@ function JoinMeetup() {
                             fullWidth
                             variant="contained"
                             onClick={handleJoinMeetup}
-                            disabled={isJoining}
                             className="font-jakarta h-12 text-base font-medium"
                             sx={{
                                 backgroundColor: '#5D9BFC',
@@ -129,13 +112,9 @@ function JoinMeetup() {
                                 '&:hover': {
                                     backgroundColor: '#4A8BFC',
                                 },
-                                '&:disabled': {
-                                    backgroundColor: '#E5E7EB',
-                                    color: '#9CA3AF',
-                                }
                             }}
                         >
-                            {isJoining ? 'Joining...' : 'Join Meetup'}
+                            Join Meetup
                         </Button>
                     </Box>
                 )}

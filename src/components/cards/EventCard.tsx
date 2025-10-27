@@ -73,13 +73,17 @@ export const EventCard = ({
                                 component='img'
                                 image={imageUrl}
                                 alt={title}
-                                className='h-full w-full rounded-xl'
+                                loading="lazy"
+                                className='h-full w-full rounded-xl object-cover'
+                                sx={{
+                                    backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
+                                }}
                             />
                             {category && (
-                                <Chip 
-                                    label={category} 
-                                    size='small' 
-                                    className='absolute top-2 left-2 z-10 text-xs font-medium h-6 rounded-full bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800' 
+                                <Chip
+                                    label={category}
+                                    size='small'
+                                    className='absolute top-2 left-2 z-10 text-xs font-medium h-6 rounded-full bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800'
                                 />
                             )}
                         </Box>
@@ -182,7 +186,11 @@ export const EventCard = ({
                                 component='img'
                                 image={imageUrl}
                                 alt={title}
+                                loading="lazy"
                                 className='h-full w-full rounded-xl object-cover'
+                                sx={{
+                                    backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
+                                }}
                             />
                             {category && (
                                 <Chip 
@@ -268,7 +276,16 @@ export const EventCard = ({
             case 'horizontal-compact':
                 return (
                     <Box className='flex h-full gap-2'>
-                        <CardMedia component='img' image={imageUrl} className='h-full w-20 rounded-xl' />
+                        <CardMedia
+                            component='img'
+                            image={imageUrl}
+                            alt={title}
+                            loading="lazy"
+                            className='h-full w-20 rounded-xl object-cover'
+                            sx={{
+                                backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
+                            }}
+                        />
                         <Box className='flex w-full flex-col justify-between'>
                             <Typography
                                 variant='body2'
@@ -293,11 +310,14 @@ export const EventCard = ({
                                     <Button
                                         variant='contained'
                                         size='small'
-                                        onClick={onAction}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onAction?.(e);
+                                        }}
                                         disabled={disabled}
                                         className={`h-9 text-sm font-medium rounded-full transition-all duration-200 ${
-                                            isFull 
-                                                ? 'bg-gray-500 text-white' 
+                                            isFull
+                                                ? 'bg-gray-500 text-white'
                                                 : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:-translate-y-0.5'
                                         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
@@ -308,7 +328,12 @@ export const EventCard = ({
                                     <Button
                                         variant='contained'
                                         size='small'
-                                        onClick={isCancelled ? undefined : onAction}
+                                        onClick={(e) => {
+                                            if (!isCancelled) {
+                                                e.stopPropagation();
+                                                onAction?.(e);
+                                            }
+                                        }}
                                         disabled={isCancelled}
                                         className={`h-9 text-sm font-medium rounded-full transition-all duration-200-cancel ${
                                             isCancelled
@@ -343,7 +368,16 @@ export const EventCard = ({
                 return (
                     <Box className='flex flex-col gap-3'>
                         <Box className='flex gap-3'>
-                            <CardMedia component='img' image={imageUrl} className='h-24 w-24 rounded-lg' />
+                            <CardMedia
+                                component='img'
+                                image={imageUrl}
+                                alt={title}
+                                loading="lazy"
+                                className='h-24 w-24 rounded-lg object-cover'
+                                sx={{
+                                    backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
+                                }}
+                            />
                             <Box className='flex h-24 w-full flex-col justify-between gap-1'>
                                 <Box className='flex items-start justify-between gap-2'>
                                     <Typography

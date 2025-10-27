@@ -1,24 +1,47 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { getAllItems, getItemById } from '@/services';
 
 const STALE_TIME_SHORT = 2 * 60 * 1000;
 const STALE_TIME_LONG = 5 * 60 * 1000;
 const MAX_RETRIES = 2;
+const PAGE_SIZE = 20;
 
-export const useUnifiedItems = (filters?: Record<string, any>) => {
-  const query = useQuery({
-    queryKey: ['unified-items', filters || {}],
-    queryFn: getAllItems,
+export const useUnifiedItems = (options?: {
+  pageSize?: number;
+  sortBy?: 'start_date' | 'created_at';
+  sortOrder?: 'asc' | 'desc';
+}) => {
+  const query = useInfiniteQuery({
+    queryKey: ['unified-items', options || {}],
+    queryFn: ({ pageParam = 0 }) =>
+      getAllItems({
+        page: pageParam,
+        pageSize: options?.pageSize || PAGE_SIZE,
+        sortBy: options?.sortBy,
+        sortOrder: options?.sortOrder,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < (options?.pageSize || PAGE_SIZE)) {
+        return undefined;
+      }
+      return allPages.length;
+    },
     staleTime: STALE_TIME_SHORT,
     retry: (failureCount) => failureCount < MAX_RETRIES,
   });
 
+  const allData = query.data?.pages.flat() || [];
+
   return {
-    data: query.data || [],
+    data: allData,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
+    fetchNextPage: query.fetchNextPage,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
   };
 };
 

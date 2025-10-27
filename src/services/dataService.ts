@@ -387,40 +387,77 @@ export const fetchUserStats = async (userId?: string) => {
 };
 
 
-export const getAllItems = async (): Promise<UnifiedItem[]> => {
+export const getAllItems = async (options?: {
+  page?: number;
+  pageSize?: number;
+  sortBy?: 'start_date' | 'created_at';
+  sortOrder?: 'asc' | 'desc';
+}): Promise<UnifiedItem[]> => {
   let currentUser = null;
-  
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
     currentUser = user;
   } catch (error) {
-    // JWT expired or invalid - continue without user context
     console.log('No valid user session, loading public data only');
   }
-  
-  const eventsQuery = supabase.from('events').select('*').neq('status', 'cancelled');
-  const meetupsQuery = supabase.from('meetups').select('*').neq('status', 'cancelled');
-  
+
+  const page = options?.page || 0;
+  const pageSize = options?.pageSize || 20;
+  const sortBy = options?.sortBy || 'start_date';
+  const sortOrder = options?.sortOrder || 'asc';
+
+  const from = page * pageSize;
+  const to = from + pageSize - 1;
+
+  const eventsQuery = supabase
+    .from('events')
+    .select('*')
+    .neq('status', 'cancelled')
+    .order('featured', { ascending: false })
+    .order(sortBy, { ascending: sortOrder === 'asc' })
+    .range(from, to);
+
+  const meetupsQuery = supabase
+    .from('meetups')
+    .select('*')
+    .neq('status', 'cancelled')
+    .order('featured', { ascending: false })
+    .order(sortBy, { ascending: sortOrder === 'asc' })
+    .range(from, to);
+
   const [eventsResult, meetupsResult] = await Promise.all([
     eventsQuery,
     meetupsQuery
   ]);
-  
+
   if (eventsResult.error) throw eventsResult.error;
   if (meetupsResult.error) throw meetupsResult.error;
-  
+
   const events: UnifiedItem[] = (eventsResult.data || []).map(event => ({
     ...event,
     type: 'event' as const,
   }));
-  
+
   const meetups: UnifiedItem[] = (meetupsResult.data || []).map(meetup => ({
     ...meetup,
     type: 'meetup' as const,
   }));
-  
-  const result = [...events, ...meetups];
-  
+
+  const result = [...events, ...meetups].sort((a, b) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (!aValue || !bValue) return 0;
+
+    const aDate = new Date(aValue).getTime();
+    const bDate = new Date(bValue).getTime();
+    return sortOrder === 'asc' ? aDate - bDate : bDate - aDate;
+  });
+
   return result;
 };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { Container, Avatar, Typography, Stack, IconButton, Chip, TextField, InputAdornment, Box, Button } from '@mui/material';
 import { LocationOn, Search, Tune } from '@mui/icons-material';
 
@@ -12,11 +12,9 @@ import { getCategoryIcon } from '@/components/icons/CategoryIcon';
 
 import { useUser, useBookings, useUpdateBooking } from '@/hooks/useData';
 import { useUnifiedItems } from '@/hooks/useUnifiedItems';
-import { usePagination } from '@/hooks/usePagination';
 
 import { useUserStore } from '@/store/userStore';
 import { useFiltersStore } from '@/store/filtersStore';
-import { useDataStore } from '@/store/dataStore';
 
 import { showSuccess, showError } from '@/utils/notifications';
 import { detectUserLocation } from '@/utils/geo';
@@ -28,7 +26,6 @@ import CancelEventDialog from '@/components/dialogs/CancelEventDialog';
 import { useCancelEvent } from '@/hooks/useCancelEvent';
 
 import { hasActiveFilters, getFilteredItems } from '@/utils/filterUtils';
-import { getSeatAvailability } from '@/services/dataService';
 
 function Home() {
     const navigate = useNavigate();
@@ -69,20 +66,21 @@ function Home() {
         priceRange,
         resetFilters
     } = useFiltersStore();
-    const dataStore = useDataStore();
     const [detecting, setDetecting] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
     const isDarkMode = useUserStore(state => state.isDarkMode);
     const [isFilterOpen, setFilterOpen] = useState(false);
-    const { getVisibleItems, loadMore, hasMore, getRemainingCount } = usePagination();
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<UnifiedItem | null>(null);
     const { cancelEvent, isLoading: isCancelling } = useCancelEvent();
-    const { 
-        data: items = [], 
-        isLoading: itemsLoading, 
+    const {
+        data: items = [],
+        isLoading: itemsLoading,
         error: itemsError,
-        refetch: refetchItems
+        refetch: refetchItems,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
     } = useUnifiedItems();
 
         const filteredItems = getFilteredItems(items, {
@@ -427,7 +425,7 @@ function Home() {
                 </Box>
                 <Stack direction='column' spacing={2} className='py-4 pb-24'>
                     {filteredItems.length > 0 ? (
-                        getVisibleItems(filteredItems).map((item: UnifiedItem) => renderEventCard(item, 'horizontal-compact'))
+                        filteredItems.map((item: UnifiedItem) => renderEventCard(item, 'horizontal-compact'))
                     ) : (
                         <Typography variant='body2' className={`py-4 text-center font-jakarta ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             {hasActiveFilters({
@@ -446,14 +444,15 @@ function Home() {
                         </Typography>
                     )}
 
-                    {hasMore(filteredItems.length) && (
+                    {hasNextPage && (
                         <Box className='mt-4 flex justify-center'>
                             <Button
                                 variant='outlined'
-                                onClick={loadMore}
+                                onClick={() => fetchNextPage()}
+                                disabled={isFetchingNextPage}
                                 className='border-primary text-primary hover:border-primary-light hover:bg-primary/10'
                             >
-                                More ({getRemainingCount(filteredItems.length)})
+                                {isFetchingNextPage ? 'Loading...' : 'Load More'}
                             </Button>
                         </Box>
                     )}

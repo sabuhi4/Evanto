@@ -26,6 +26,7 @@ const ManageEvents = lazy(() => import('@/features/events/ManageEvents'));
 const CreateMeetupStep1 = lazy(() => import('@/features/meetups/CreateMeetupStep1'));
 const CreateMeetupStep2 = lazy(() => import('@/features/meetups/CreateMeetupStep2'));
 const CreateMeetupStep3 = lazy(() => import('@/features/meetups/CreateMeetupStep3'));
+const JoinMeetup = lazy(() => import('@/features/meetups/JoinMeetup'));
 
 const Home = lazy(() => import('@/features/Home'));
 const Search = lazy(() => import('@/features/Search'));
@@ -91,6 +92,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/meetups/create/step-1" element={<ProtectedRoute><CreateMeetupStep1 /></ProtectedRoute>} />
                 <Route path="/meetups/create/step-2" element={<ProtectedRoute><CreateMeetupStep2 /></ProtectedRoute>} />
                 <Route path="/meetups/create/step-3" element={<ProtectedRoute><CreateMeetupStep3 /></ProtectedRoute>} />
+                <Route path="/meetups/join/:id" element={<ProtectedRoute><JoinMeetup /></ProtectedRoute>} />
 
                 <Route path="/bookings/event/:id" element={<ProtectedRoute><BookEvent /></ProtectedRoute>} />
                 <Route path="/bookings/select-seats" element={<ProtectedRoute><SelectSeats /></ProtectedRoute>} />
