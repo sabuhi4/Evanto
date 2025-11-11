@@ -54,10 +54,8 @@ export default function AuthCallback() {
                 }
 
                 if (userProfile) {
-                    console.log('Setting existing user and navigating to home');
                     setUser(userProfile);
                     setTimeout(() => {
-                        console.log('Navigating to /home with user:', userProfile.email);
                         navigate('/home', { replace: true });
                     }, 100);
                 } else {
@@ -81,12 +79,10 @@ export default function AuthCallback() {
                     if (insertError) {
                         showError('Failed to create user profile');
                     } else {
-                        console.log('Setting new user and navigating to home');
                         setUser(newUser);
                     }
 
                     setTimeout(() => {
-                        console.log('Navigating to /home with new user:', newUser.email);
                         navigate('/home', { replace: true });
                     }, 100);
                 }
