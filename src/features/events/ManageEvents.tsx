@@ -78,7 +78,6 @@ function ManageEvents() {
                     setItemToDelete(null);
                 },
                 onError: (error) => {
-                    console.error('Delete error:', error);
                     showError('Failed to delete event');
                 }
             });
@@ -90,7 +89,6 @@ function ManageEvents() {
                     setItemToDelete(null);
                 },
                 onError: (error) => {
-                    console.error('Delete error:', error);
                     showError('Failed to delete meetup');
                 }
             });

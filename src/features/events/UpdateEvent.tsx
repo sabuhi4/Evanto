@@ -91,7 +91,6 @@ function UpdateEvent() {
                         .upload(filePath, selectedImage);
 
                     if (uploadError) {
-                        console.error('Upload failed:', uploadError);
                         showError('Failed to upload image');
                         image_url = null;
                     } else {
@@ -130,7 +129,6 @@ function UpdateEvent() {
                             navigate('/events/manage');
                         },
                         onError: (error) => {
-                            console.error('Update error:', error);
                             showError('Failed to update event');
                         },
                     }
@@ -144,14 +142,12 @@ function UpdateEvent() {
                             navigate('/events/manage');
                         },
                         onError: (error) => {
-                            console.error('Update error:', error);
                             showError('Failed to update meetup');
                         },
                     }
                 );
             }
         } catch (error) {
-            console.error('Update error:', error);
             showError('Failed to update item');
         } finally {
             setLoading(false);
@@ -195,8 +191,8 @@ function UpdateEvent() {
                 <Box className="no-scrollbar w-full overflow-y-auto">
                     {/* Header */}
                     <Box className="mb-8 flex w-full items-center justify-between">
-                        <IconButton 
-                            onClick={() => navigate('/events/manage')} 
+                        <IconButton
+                            onClick={() => navigate(-1)}
                         >
                             <KeyboardArrowLeft />
                         </IconButton>

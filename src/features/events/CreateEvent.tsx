@@ -71,7 +71,6 @@ const CreateEvent: React.FC = () => {
             const { fetchUserProfile } = await import('@/services');
             await fetchUserProfile();
         } catch (error) {
-            console.error('Error ensuring user profile:', error);
             showError('Failed to verify user profile. Please try again.');
             return;
         }
@@ -89,7 +88,6 @@ const CreateEvent: React.FC = () => {
                 .upload(filePath, selectedImage);
 
             if (uploadError) {
-                console.error('Upload failed:', uploadError);
                 showError('Failed to upload image');
                 image_url = null;
             } else {

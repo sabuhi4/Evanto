@@ -8,9 +8,11 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { queryClient } from '@/lib/queryClient';
 import { MUIThemeProvider } from '@/contexts/MUIThemeProvider';
 import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
+import { useSupabaseAuthSync } from '@/hooks/useSupabaseAuthSync';
 import { AppRoutes } from '@/routes';
 
-const RealtimeProvider: React.FC = () => {
+const AppInitializer: React.FC = () => {
+    useSupabaseAuthSync();
     useRealtimeUpdates();
     return null;
 };
@@ -23,7 +25,7 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
     return (
         <MUIThemeProvider>
             <QueryClientProvider client={queryClient}>
-                <RealtimeProvider />
+                <AppInitializer />
                 <ReactQueryDevtools initialIsOpen={false} />
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <Router>

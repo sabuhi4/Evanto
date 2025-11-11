@@ -34,7 +34,6 @@ function Summary() {
     // Auto-select default payment method when component loads
     React.useEffect(() => {
         if (cardsError) {
-            console.error('Payment cards error:', cardsError);
         }
         
         if (paymentCards && !bookingFlow.payment_method) {
@@ -57,17 +56,13 @@ function Summary() {
             const eventId = item?.type === 'event' ? item?.id : undefined;
             const meetupId = item?.type === 'meetup' ? item?.id : undefined;
             
-            const existingBooking = userBookings.find(booking => 
+            const existingBooking = userBookings.find(booking =>
                 (eventId && booking.event_id === eventId)
             );
-            
+
             if (existingBooking) {
-                if (process.env.NODE_ENV === 'development') {
-                    showSuccess('Development mode: Allowing re-booking for testing purposes');
-                } else {
-                    showError('You have already booked this event! View your bookings in the Profile section.');
-                    return;
-                }
+                showError('You have already booked this event! View your bookings in the Profile section.');
+                return;
             }
 
             const bookingId = `BK${Date.now()}`.slice(-8);
@@ -99,13 +94,11 @@ function Summary() {
                     if (bookingError?.code === '23505' && bookingError?.message?.includes('bookings_user_id_event_id_key')) {
                         showError('You have already booked this event!');
                     } else {
-                        console.error('Booking error:', bookingError);
                         showError('Failed to create booking. Please try again.');
                     }
                 }
             });
         } catch (error: unknown) {
-            console.error('Booking creation error:', error);
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             showError('Payment failed: ' + errorMessage);
         }

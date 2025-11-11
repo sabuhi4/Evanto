@@ -1,6 +1,7 @@
 import { useUserStore } from '@/store/userStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { addFavorite, deleteFavorite, fetchFavorites } from '@/services';
+import { queryKeys } from '@/lib/queryKeys';
 
 type Favorite = {
     item_id: string;
@@ -13,7 +14,7 @@ export function useFavorite(itemId?: string | null | undefined | number, itemTyp
     const queryClient = useQueryClient();
 
     const { data: favorites = [], isLoading } = useQuery<Favorite[]>({
-        queryKey: ['favorites', user?.id],
+        queryKey: queryKeys.favorites(user?.id),
         queryFn: () => user?.id ? fetchFavorites(user.id) : [],
         enabled: !!user?.id,
     });
@@ -31,7 +32,7 @@ export function useFavorite(itemId?: string | null | undefined | number, itemTyp
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['favorites', user?.id] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.favorites(user?.id) });
         },
     });
 

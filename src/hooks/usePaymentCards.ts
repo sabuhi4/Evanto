@@ -6,10 +6,11 @@ import {
     deletePaymentCard,
     setDefaultPaymentCard,
 } from '@/services';
+import { queryKeys } from '@/lib/queryKeys';
 
 export const usePaymentCards = () => {
     return useQuery({
-        queryKey: ['payment-cards'],
+        queryKey: queryKeys.paymentCards(),
         queryFn: fetchPaymentCards,
     });
 };
@@ -20,7 +21,7 @@ export const useCreatePaymentCard = () => {
     return useMutation({
         mutationFn: createPaymentCard,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['payment-cards'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.paymentCards() });
         },
     });
 };
@@ -32,7 +33,7 @@ export const useUpdatePaymentCard = () => {
         mutationFn: ({ id, data }: { id: string; data: Parameters<typeof updatePaymentCard>[1] }) =>
             updatePaymentCard(id, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['payment-cards'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.paymentCards() });
         },
     });
 };
@@ -43,7 +44,7 @@ export const useDeletePaymentCard = () => {
     return useMutation({
         mutationFn: deletePaymentCard,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['payment-cards'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.paymentCards() });
         },
     });
 };
@@ -54,7 +55,7 @@ export const useSetDefaultPaymentCard = () => {
     return useMutation({
         mutationFn: setDefaultPaymentCard,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['payment-cards'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.paymentCards() });
         },
     });
 };

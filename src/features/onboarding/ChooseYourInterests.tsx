@@ -132,7 +132,6 @@ function ChooseYourInterests() {
             showSuccess('Interests saved successfully!');
             navigate('/onboarding/congratulations', { state: { context: 'account' } });
         } catch (error) {
-            console.error('Save interests error:', error);
             showError('Failed to save interests. Please try again.');
         } finally {
             setIsLoading(false);

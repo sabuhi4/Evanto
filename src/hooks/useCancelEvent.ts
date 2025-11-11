@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { updateEvent, updateMeetup } from '@/services/dataService';
 import { showSuccess, showError } from '@/utils/notifications';
 import type { UnifiedItem } from '@/utils/schemas';
+import { queryKeys } from '@/lib/queryKeys';
 
 export const useCancelEvent = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -24,12 +25,14 @@ export const useCancelEvent = () => {
                 showSuccess('Meetup cancelled successfully');
             }
 
-            await queryClient.invalidateQueries({ queryKey: ['events'] });
-            await queryClient.invalidateQueries({ queryKey: ['meetups'] });
-            await queryClient.invalidateQueries({ queryKey: ['unifiedItems'] });
+            if (item.type === 'event') {
+                await queryClient.invalidateQueries({ queryKey: queryKeys.events() });
+            } else {
+                await queryClient.invalidateQueries({ queryKey: queryKeys.meetups() });
+            }
+            await queryClient.invalidateQueries({ queryKey: queryKeys.unifiedItems() });
             
         } catch (error) {
-            console.error('Error cancelling event:', error);
             showError('Failed to cancel event. Please try again.');
         } finally {
             setIsLoading(false);

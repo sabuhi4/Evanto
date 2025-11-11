@@ -52,7 +52,6 @@ function CreateMeetupStep3() {
                 navigate('/home');
             },
             onError: (error: any) => {
-                console.error('Error creating meetup:', error);
                 showError('Error creating meetup: ' + error.message);
             }
         });

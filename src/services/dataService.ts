@@ -171,7 +171,6 @@ export const fetchPaymentCards = async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching payment cards:', error);
     return [];
   }
   return data || [];
@@ -393,15 +392,6 @@ export const getAllItems = async (options?: {
   sortBy?: 'start_date' | 'created_at';
   sortOrder?: 'asc' | 'desc';
 }): Promise<UnifiedItem[]> => {
-  let currentUser = null;
-
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    currentUser = user;
-  } catch (error) {
-    console.log('No valid user session, loading public data only');
-  }
-
   const page = options?.page || 0;
   const pageSize = options?.pageSize || 20;
   const sortBy = options?.sortBy || 'start_date';

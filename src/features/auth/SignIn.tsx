@@ -70,7 +70,7 @@ export const SignIn = () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider,
             options: {
-                redirectTo: window.location.origin + '/',
+                redirectTo: window.location.origin + '/auth/callback',
                 scopes: provider === 'google' ? 'openid email profile https://www.googleapis.com/auth/userinfo.profile' : undefined,
                 queryParams: provider === 'google' ? {
                     access_type: 'offline',

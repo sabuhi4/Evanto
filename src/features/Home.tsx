@@ -103,6 +103,9 @@ function Home() {
                 <Typography variant="h6" className="text-center text-red-500">
                     Error loading items: {itemsError.message}
                 </Typography>
+                <Button onClick={() => refetchItems()} className="mt-4">
+                    Retry
+                </Button>
             </Container>
         );
     }
@@ -190,7 +193,6 @@ function Home() {
             
             const userBooking = getUserBooking(item);
             if (!userBooking) {
-                console.error('No booking found for this event/meetup');
                 return;
             }
 
@@ -211,7 +213,6 @@ function Home() {
                         showSuccess(`Successfully left ${item.type === 'meetup' ? 'meetup' : 'event'}!`);
                     },
                     onError: (error: any) => {
-                        console.error('Error leaving event/meetup:', error);
                         showError(error.message || 'Failed to leave event/meetup');
                     }
                 }

@@ -211,7 +211,6 @@ export const Profile = () => {
                         showSuccess('Profile updated successfully!');
                     },
                     onError: (profileError: any) => {
-                        console.error('Profile update error:', profileError);
                         
                         if (profileError.message?.includes('avatar_url') || profileError.code === 'PGRST204') {
                             showError('Database schema needs update. Please run the migration script first.');
@@ -222,7 +221,6 @@ export const Profile = () => {
                 });
             }
         } catch (error: any) {
-            console.error('Error updating profile:', error);
             showError(`Failed to update profile: ${error?.message || 'Unknown error'}`);
         }
     };
@@ -281,7 +279,6 @@ export const Profile = () => {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) {
-                console.error('Logout error:', error);
                 showError('Failed to logout');
             } else {
                 setUser(null);
@@ -291,7 +288,6 @@ export const Profile = () => {
                 navigate('/');
             }
         } catch (error) {
-            console.error('Logout error:', error);
             showError('Failed to logout');
         }
         handleMenuClose();

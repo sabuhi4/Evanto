@@ -193,10 +193,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS** - Styling framework
 - **React Community** - Open source ecosystem
 
-## 📞 Support
-
-For support or questions, please open an issue on GitHub.
-
----
-
-**Built with ❤️ by the Evanto Team**

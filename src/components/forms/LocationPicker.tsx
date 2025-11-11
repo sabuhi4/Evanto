@@ -65,7 +65,6 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ value, onChange,
                         .filter((entry, index, array) => array.indexOf(entry) === index);
                     setSuggestions(results);
                 } catch (error) {
-                    console.error('Error fetching location suggestions:', error);
                     setSuggestions([]);
                 }
             } else {

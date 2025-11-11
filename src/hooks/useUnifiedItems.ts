@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { getAllItems, getItemById } from '@/services';
+import { queryKeys } from '@/lib/queryKeys';
 
 const STALE_TIME_SHORT = 2 * 60 * 1000;
 const STALE_TIME_LONG = 5 * 60 * 1000;
@@ -12,7 +13,7 @@ export const useUnifiedItems = (options?: {
   sortOrder?: 'asc' | 'desc';
 }) => {
   const query = useInfiniteQuery({
-    queryKey: ['unified-items', options || {}],
+    queryKey: queryKeys.unifiedItems(options),
     queryFn: ({ pageParam = 0 }) =>
       getAllItems({
         page: pageParam,
@@ -47,7 +48,7 @@ export const useUnifiedItems = (options?: {
 
 export const useUnifiedItem = (id: string, type: 'event' | 'meetup') => {
   const query = useQuery({
-    queryKey: ['unified-item', id, type],
+    queryKey: queryKeys.unifiedItem(id, type),
     queryFn: () => getItemById(id, type),
     enabled: !!id && !!type,
     staleTime: STALE_TIME_LONG,

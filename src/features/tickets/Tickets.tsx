@@ -94,7 +94,6 @@ function Tickets() {
                     setTicketToCancel(null);
                 },
                 onError: (error) => {
-                    console.error('Error cancelling ticket:', error);
                     showError('Failed to cancel ticket. Please try again.');
                 }
             }

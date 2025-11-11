@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/utils/supabase';
+import { queryKeys } from '@/lib/queryKeys';
 
 const createRealtimeChannel = (table: string, queryClient: any) => {
     return supabase
@@ -13,8 +14,14 @@ const createRealtimeChannel = (table: string, queryClient: any) => {
                 table,
             },
             () => {
-                queryClient.invalidateQueries({ queryKey: [table] });
-                queryClient.invalidateQueries({ queryKey: ['items'] });
+                if (table === 'events') {
+                    queryClient.invalidateQueries({ queryKey: queryKeys.events() });
+                } else if (table === 'meetups') {
+                    queryClient.invalidateQueries({ queryKey: queryKeys.meetups() });
+                } else if (table === 'bookings') {
+                    queryClient.invalidateQueries({ queryKey: queryKeys.bookings() });
+                }
+                queryClient.invalidateQueries({ queryKey: queryKeys.unifiedItems() });
             }
         )
         .subscribe();
