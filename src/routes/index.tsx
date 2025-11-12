@@ -81,7 +81,7 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/onboarding/congratulations" element={<PublicRoute><Congratulation /></PublicRoute>} />
                 <Route path="/welcome" element={<PublicRoute><Welcome /></PublicRoute>} />
 
-                <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/home" element={<Home />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
                 <Route path="/upcoming" element={<ProtectedRoute><UpcomingEvent /></ProtectedRoute>} />
@@ -100,13 +100,13 @@ export const AppRoutes: React.FC = () => {
                 <Route path="/bookings/select-seats" element={<ProtectedRoute><SelectSeats /></ProtectedRoute>} />
                 <Route path="/bookings/summary" element={<ProtectedRoute><Summary /></ProtectedRoute>} />
 
-                <Route path="/tickets" element={<ProtectedRoute><Ticket /></ProtectedRoute>} />
+                <Route path="/tickets" element={<Ticket />} />
                 <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetails /></ProtectedRoute>} />
 
                 <Route path="/payments/cards" element={<ProtectedRoute><CreateCard /></ProtectedRoute>} />
                 <Route path="/payments/details" element={<ProtectedRoute><PaymentDetails /></ProtectedRoute>} />
 
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/profile/language" element={<ProtectedRoute><Language /></ProtectedRoute>} />
                 <Route path="/profile/notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
